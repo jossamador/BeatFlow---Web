@@ -1,0 +1,70 @@
+# compiled output
+/dist
+/tmp
+/out-tsc
+
+# dependencies
+/node_modules
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+
+# lockfiles (if you use different package managers locally)
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# IntelliJ / JetBrains
+*.iml
+
+
+# misc
+/.angular/cache
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+testem.log
+/typings
+/docs
+
+# e2e
+/e2e/*.js
+/e2e/*.map
+
+
+# Environment files
+.env
+.env.*
+.env.local
+
+# Build caches & tooling
+.ng_build
+.nyc_output
+.parcel-cache
+.cache
+.eslintcache
+.turbo
+
+# CI / deployment artifacts
+.firebase
+.vercel
+.netlify
+
+# Local logs and temp
+*.log
+.history
+# System Files
+.DS_Store
+Thumbs.db
