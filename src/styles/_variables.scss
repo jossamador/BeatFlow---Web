@@ -1,0 +1,26 @@
+$beatflow-primary: #ff4d6d;
+$beatflow-primary-600: #e63d5a;
+$beatflow-primary-700: #cc324d;
+
+$beatflow-secondary: #2dd4bf;
+$beatflow-accent: #7c3aed;
+
+$beatflow-bg: #0f172a;
+$beatflow-surface: #111c36;
+$beatflow-surface-elevated: #182544;
+$beatflow-text: #f8fafc;
+$beatflow-text-muted: #94a3b8;
+$beatflow-border: rgba(148, 163, 184, 0.18);
+
+$beatflow-gradient: linear-gradient(135deg, $beatflow-primary 0%, $beatflow-accent 100%);
+
+// Semantic aliases for reusable app-level styling outside Nebular tokens.
+$brand-primary: $beatflow-primary;
+$brand-secondary: $beatflow-secondary;
+$brand-accent: $beatflow-accent;
+$brand-bg: $beatflow-bg;
+$brand-surface: $beatflow-surface;
+$brand-surface-elevated: $beatflow-surface-elevated;
+$brand-text: $beatflow-text;
+$brand-text-muted: $beatflow-text-muted;
+$brand-border: $beatflow-border;
