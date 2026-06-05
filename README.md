@@ -76,7 +76,7 @@ BeatFlow está dirigido a:
 
 ### API externa
 
-- Last.fm API
+- BeatFlow API (`https://beatflow-api.onrender.com`)
 
 ## Funcionalidades principales
 
@@ -147,7 +147,7 @@ Angular + ngx-admin + Nebular UI.
 
 ### Datos externos
 
-Información musical obtenida mediante Last.fm API.
+Información musical obtenida mediante BeatFlow API, que centraliza autenticación y exploración musical.
 
 ### Visualización
 
@@ -219,7 +219,7 @@ Pruebas consideradas para el frontend:
 
 ## Despliegue
 
-La arquitectura de despliegue contempla al usuario consumiendo el frontend Angular, el cual se conecta a la API externa de Last.fm para obtener datos musicales.
+La arquitectura de despliegue contempla al usuario consumiendo el frontend Angular, el cual se conecta a BeatFlow API en producción para autenticación, tendencias, artistas, búsqueda y detalle musical.
 
 ## Visión del producto
 

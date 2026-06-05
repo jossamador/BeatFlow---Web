@@ -5,8 +5,7 @@
  */
 export const environment = {
   production: true,
-  lastFm: {
-    baseUrl: 'https://ws.audioscrobbler.com/2.0/',
-    apiKey: '',
+  beatflowApi: {
+    baseUrl: 'https://beatflow-api.onrender.com',
   },
 };

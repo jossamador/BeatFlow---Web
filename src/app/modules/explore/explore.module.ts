@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { Component, Injectable, NgModule, OnDestroy, OnInit } from '@angular/core';
+import { Component, NgModule, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, ParamMap, RouterModule, Routes } from '@angular/router';
 import {
@@ -13,74 +12,25 @@ import {
   NbSpinnerModule,
 } from '@nebular/theme';
 import { Observable, Subject, combineLatest, of } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, map, startWith, switchMap, takeUntil } from 'rxjs/operators';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  finalize,
+  map,
+  startWith,
+  switchMap,
+  takeUntil,
+} from 'rxjs/operators';
 
-import { environment } from '../../../environments/environment';
-
-interface LastFmArtistImage {
-  size: string;
-  '#text': string;
-}
-
-interface LastFmTopArtist {
-  name: string;
-  playcount: string;
-  listeners: string;
-  image: LastFmArtistImage[];
-  url: string;
-}
-
-interface LastFmTopArtistsResponse {
-  artists: {
-    artist: LastFmTopArtist[];
-  };
-}
-
-interface LastFmSearchTrack {
-  name: string;
-  artist: string;
-  listeners?: string;
-  image: LastFmArtistImage[];
-  url: string;
-}
-
-interface LastFmSearchArtist {
-  name: string;
-  listeners?: string;
-  image: LastFmArtistImage[];
-  url: string;
-}
-
-interface LastFmTrackSearchResponse {
-  results: {
-    trackmatches: {
-      track: LastFmSearchTrack[] | LastFmSearchTrack;
-    };
-  };
-}
-
-interface LastFmArtistSearchResponse {
-  results: {
-    artistmatches: {
-      artist: LastFmSearchArtist[] | LastFmSearchArtist;
-    };
-  };
-}
-
-interface LastFmArtistInfoResponse {
-  artist: {
-    name: string;
-    url: string;
-    image: LastFmArtistImage[];
-    stats: {
-      listeners: string;
-      playcount: string;
-    };
-    bio?: {
-      summary?: string;
-    };
-  };
-}
+import {
+  BeatflowArtist,
+  BeatflowArtistDetail,
+  BeatflowExploreService,
+  BeatflowSearchResponse,
+  BeatflowSearchType,
+  BeatflowTrack,
+} from '../../@core/services';
 
 interface PopularArtist {
   name: string;
@@ -99,16 +49,16 @@ interface ArtistDetail {
   url: string;
 }
 
-type SearchFilter = 'track' | 'artist';
-
 interface SearchResult {
-  type: SearchFilter;
+  type: 'track' | 'artist';
   title: string;
   subtitle: string;
   listeners: number;
   image: string;
   url: string;
 }
+
+const PLACEHOLDER_IMAGE = 'https://placehold.co/320x320/0f172a/f8fafc?text=BF';
 
 const FALLBACK_ARTISTS: PopularArtist[] = [
   {
@@ -168,155 +118,6 @@ const FALLBACK_TRACK_RESULTS: SearchResult[] = [
   },
 ];
 
-@Injectable({ providedIn: 'root' })
-class PopularArtistsService {
-  constructor(private http: HttpClient) {}
-
-  getTopArtists(limit: number = 12): Observable<PopularArtist[]> {
-    if (!environment.lastFm.apiKey) {
-      return of(FALLBACK_ARTISTS);
-    }
-
-    const endpoint = `${environment.lastFm.baseUrl}?method=chart.gettopartists&limit=${limit}&api_key=${environment.lastFm.apiKey}&format=json`;
-
-    return this.http.get<LastFmTopArtistsResponse>(endpoint).pipe(
-      map((response) => response.artists.artist.map((artist) => this.mapTopArtist(artist))),
-      catchError(() => of(FALLBACK_ARTISTS)),
-    );
-  }
-
-  getArtistDetail(artistName: string): Observable<ArtistDetail> {
-    const fallbackArtist = FALLBACK_ARTISTS.find((artist) => artist.name === artistName) || FALLBACK_ARTISTS[0];
-
-    if (!environment.lastFm.apiKey) {
-      return of({
-        ...fallbackArtist,
-        summary: `${fallbackArtist.name} es uno de los artistas más populares del momento en BeatFlow.`,
-      });
-    }
-
-    const endpoint = `${environment.lastFm.baseUrl}?method=artist.getinfo&artist=${encodeURIComponent(artistName)}&api_key=${environment.lastFm.apiKey}&format=json`;
-
-    return this.http.get<LastFmArtistInfoResponse>(endpoint).pipe(
-      map((response) => this.mapArtistDetail(response)),
-      catchError(() => of({
-        ...fallbackArtist,
-        summary: `${fallbackArtist.name} es uno de los artistas más populares del momento en BeatFlow.`,
-      })),
-    );
-  }
-
-  searchMusic(query: string, filter: SearchFilter): Observable<SearchResult[]> {
-    const normalizedQuery = (query || '').trim();
-    if (!normalizedQuery) {
-      return of([]);
-    }
-
-    if (!environment.lastFm.apiKey) {
-      return of(filter === 'track'
-        ? FALLBACK_TRACK_RESULTS.filter((result) => this.matchesQuery(result, normalizedQuery))
-        : FALLBACK_ARTISTS
-          .map((artist) => this.toArtistSearchResult(artist))
-          .filter((result) => this.matchesQuery(result, normalizedQuery)));
-    }
-
-    if (filter === 'track') {
-      const trackEndpoint = `${environment.lastFm.baseUrl}?method=track.search&track=${encodeURIComponent(normalizedQuery)}&limit=10&api_key=${environment.lastFm.apiKey}&format=json`;
-      return this.http.get<LastFmTrackSearchResponse>(trackEndpoint).pipe(
-        map((response) => this.unwrapArray(response.results.trackmatches.track)
-          .map((track) => this.mapTrackSearchResult(track))),
-        catchError(() => of([])),
-      );
-    }
-
-    const artistEndpoint = `${environment.lastFm.baseUrl}?method=artist.search&artist=${encodeURIComponent(normalizedQuery)}&limit=10&api_key=${environment.lastFm.apiKey}&format=json`;
-    return this.http.get<LastFmArtistSearchResponse>(artistEndpoint).pipe(
-      map((response) => this.unwrapArray(response.results.artistmatches.artist)
-        .map((artist) => this.mapArtistSearchResult(artist))),
-      catchError(() => of([])),
-    );
-  }
-
-  private mapTopArtist(artist: LastFmTopArtist): PopularArtist {
-    return {
-      name: artist.name,
-      image: this.resolveImage(artist.image),
-      playcount: Number(artist.playcount) || 0,
-      listeners: Number(artist.listeners) || 0,
-      url: artist.url,
-    };
-  }
-
-  private mapArtistDetail(response: LastFmArtistInfoResponse): ArtistDetail {
-    const artist = response.artist;
-
-    return {
-      name: artist.name,
-      image: this.resolveImage(artist.image),
-      playcount: Number(artist.stats.playcount) || 0,
-      listeners: Number(artist.stats.listeners) || 0,
-      summary: this.toPlainText(artist.bio?.summary || 'Sin descripción disponible.'),
-      url: artist.url,
-    };
-  }
-
-  private resolveImage(images: LastFmArtistImage[]): string {
-    return [...images].reverse().find((image) => image['#text'])?.['#text']
-      || 'https://placehold.co/320x320/0f172a/f8fafc?text=BF';
-  }
-
-  private toPlainText(text: string): string {
-    return text.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
-  }
-
-  private unwrapArray<T>(value: T | T[] | undefined): T[] {
-    if (!value) {
-      return [];
-    }
-    return Array.isArray(value) ? value : [value];
-  }
-
-  private mapTrackSearchResult(track: LastFmSearchTrack): SearchResult {
-    return {
-      type: 'track',
-      title: track.name,
-      subtitle: track.artist,
-      listeners: Number(track.listeners) || 0,
-      image: this.resolveImage(track.image),
-      url: track.url,
-    };
-  }
-
-  private mapArtistSearchResult(artist: LastFmSearchArtist): SearchResult {
-    return {
-      type: 'artist',
-      title: artist.name,
-      subtitle: 'Artista',
-      listeners: Number(artist.listeners) || 0,
-      image: this.resolveImage(artist.image),
-      url: artist.url,
-    };
-  }
-
-  private toArtistSearchResult(artist: PopularArtist): SearchResult {
-    return {
-      type: 'artist',
-      title: artist.name,
-      subtitle: 'Artista',
-      listeners: artist.listeners,
-      image: artist.image,
-      url: artist.url,
-    };
-  }
-
-  private matchesQuery(result: SearchResult, query: string): boolean {
-    const normalizedTitle = result.title.toLowerCase();
-    const normalizedSubtitle = result.subtitle.toLowerCase();
-    const normalizedQuery = query.toLowerCase();
-    return normalizedTitle.includes(normalizedQuery) || normalizedSubtitle.includes(normalizedQuery);
-  }
-}
-
 @Component({
   selector: 'ngx-bf-explore-page',
   template: `
@@ -324,7 +125,7 @@ class PopularArtistsService {
       <nb-card class="search-card">
         <nb-card-header>
           <span class="eyebrow">HU-05</span>
-          <h2>Bucar canciones y artistas</h2>
+          <h2>Buscar canciones y artistas</h2>
         </nb-card-header>
         <nb-card-body>
           <div class="search-controls">
@@ -337,13 +138,18 @@ class PopularArtistsService {
             />
 
             <nb-radio-group [formControl]="filterControl" class="filter-group">
+              <nb-radio value="all">Todo</nb-radio>
               <nb-radio value="track">Canciones</nb-radio>
               <nb-radio value="artist">Artistas</nb-radio>
             </nb-radio-group>
           </div>
 
-          <nb-list *ngIf="searchControl.value && searchResults.length > 0" class="results-list">
-            <nb-list-item *ngFor="let result of searchResults">
+          <div class="search-loading" *ngIf="isSearching">
+            <nb-spinner status="primary"></nb-spinner>
+          </div>
+
+          <nb-list *ngIf="!isSearching && searchControl.value && searchResults.length > 0" class="results-list">
+            <nb-list-item *ngFor="let result of searchResults; trackBy: trackBySearchResult">
               <div class="result-row">
                 <img class="result-image" [src]="result.image" [alt]="'Imagen de ' + result.title" />
                 <div class="result-copy">
@@ -369,14 +175,14 @@ class PopularArtistsService {
             </nb-list-item>
           </nb-list>
 
-          <p class="empty-results" *ngIf="searchControl.value && searchResults.length === 0">
+          <p class="empty-results" *ngIf="!isSearching && searchControl.value && searchResults.length === 0">
             No encontramos resultados para "{{ searchControl.value }}".
           </p>
         </nb-card-body>
       </nb-card>
 
       <div class="artists-grid">
-        <nb-card class="artist-card" *ngFor="let artist of artists">
+        <nb-card class="artist-card" *ngFor="let artist of artists; trackBy: trackByArtist">
           <img class="artist-image" [src]="artist.image" [alt]="'Foto de ' + artist.name" />
           <nb-card-header>
             <span class="eyebrow">Top Artist</span>
@@ -421,6 +227,12 @@ class PopularArtistsService {
       flex-wrap: wrap;
     }
 
+    .search-loading {
+      min-height: 5rem;
+      display: grid;
+      place-items: center;
+    }
+
     .results-list {
       border: 1px solid rgba(255,255,255,0.07);
       border-radius: 0.7rem;
@@ -442,9 +254,16 @@ class PopularArtistsService {
       border-radius: 0.5rem;
     }
 
+    .result-copy {
+      min-width: 0;
+    }
+
     .result-copy h3 {
       margin: 0;
       font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .result-copy p,
@@ -493,16 +312,28 @@ class PopularArtistsService {
       margin: 0.25rem 0;
       color: rgba(240,244,255,.55);
     }
+
+    @media (max-width: 640px) {
+      .result-row {
+        grid-template-columns: 48px 1fr;
+      }
+
+      .result-row a[nbButton] {
+        grid-column: 1 / -1;
+        justify-self: stretch;
+      }
+    }
   `],
 })
 export class ExplorePageComponent implements OnInit, OnDestroy {
   searchControl = new FormControl('', { nonNullable: true });
-  filterControl = new FormControl<SearchFilter>('track', { nonNullable: true });
+  filterControl = new FormControl<BeatflowSearchType>('all', { nonNullable: true });
   searchResults: SearchResult[] = [];
   artists: PopularArtist[] = [];
+  isSearching = false;
   private destroy$ = new Subject<void>();
 
-  constructor(private popularArtistsService: PopularArtistsService) {}
+  constructor(private beatflowExploreService: BeatflowExploreService) {}
 
   ngOnInit(): void {
     combineLatest([
@@ -514,15 +345,19 @@ export class ExplorePageComponent implements OnInit, OnDestroy {
       this.filterControl.valueChanges.pipe(startWith(this.filterControl.value)),
     ])
       .pipe(
-        switchMap(([query, filter]) => this.popularArtistsService.searchMusic(query, filter)),
+        switchMap(([query, filter]) => this.searchMusic(query, filter)),
         takeUntil(this.destroy$),
       )
       .subscribe((results) => {
         this.searchResults = results;
       });
 
-    this.popularArtistsService.getTopArtists()
-      .pipe(takeUntil(this.destroy$))
+    this.beatflowExploreService.getTopArtists()
+      .pipe(
+        map((artists) => artists.map((artist) => this.mapPopularArtist(artist))),
+        catchError(() => of(FALLBACK_ARTISTS)),
+        takeUntil(this.destroy$),
+      )
       .subscribe((artists) => {
         this.artists = artists;
       });
@@ -531,6 +366,110 @@ export class ExplorePageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  trackByArtist(_: number, artist: PopularArtist): string {
+    return artist.name;
+  }
+
+  trackBySearchResult(_: number, result: SearchResult): string {
+    return `${result.type}-${result.title}-${result.subtitle}`;
+  }
+
+  private searchMusic(query: string, filter: BeatflowSearchType): Observable<SearchResult[]> {
+    const normalizedQuery = query.trim();
+
+    if (!normalizedQuery) {
+      this.isSearching = false;
+      return of([]);
+    }
+
+    this.isSearching = true;
+
+    return this.beatflowExploreService.search(normalizedQuery, filter, 12).pipe(
+      map((response) => this.mapSearchResults(response, filter)),
+      catchError(() => of(this.fallbackSearchResults(normalizedQuery, filter))),
+      finalize(() => {
+        this.isSearching = false;
+      }),
+    );
+  }
+
+  private mapSearchResults(response: BeatflowSearchResponse, filter: BeatflowSearchType): SearchResult[] {
+    const tracks = filter === 'artist'
+      ? []
+      : response.tracks.map((track) => this.mapTrackSearchResult(track));
+    const artists = filter === 'track'
+      ? []
+      : response.artists.map((artist) => this.mapArtistSearchResult(artist));
+
+    return [...tracks, ...artists];
+  }
+
+  private mapPopularArtist(artist: BeatflowArtist): PopularArtist {
+    return {
+      name: artist.name,
+      image: artist.imageUrl || PLACEHOLDER_IMAGE,
+      playcount: Number(artist.playcount) || 0,
+      listeners: Number(artist.listeners) || 0,
+      url: this.buildLastFmArtistUrl(artist.name),
+    };
+  }
+
+  private mapTrackSearchResult(track: BeatflowTrack): SearchResult {
+    return {
+      type: 'track',
+      title: track.name,
+      subtitle: track.artist,
+      listeners: Number(track.listeners) || 0,
+      image: track.imageUrl || PLACEHOLDER_IMAGE,
+      url: this.buildLastFmTrackUrl(track),
+    };
+  }
+
+  private mapArtistSearchResult(artist: BeatflowArtist): SearchResult {
+    return {
+      type: 'artist',
+      title: artist.name,
+      subtitle: 'Artista',
+      listeners: Number(artist.listeners) || 0,
+      image: artist.imageUrl || PLACEHOLDER_IMAGE,
+      url: this.buildLastFmArtistUrl(artist.name),
+    };
+  }
+
+  private fallbackSearchResults(query: string, filter: BeatflowSearchType): SearchResult[] {
+    const trackResults = filter === 'artist' ? [] : FALLBACK_TRACK_RESULTS;
+    const artistResults = filter === 'track'
+      ? []
+      : FALLBACK_ARTISTS.map((artist) => ({
+        type: 'artist' as const,
+        title: artist.name,
+        subtitle: 'Artista',
+        listeners: artist.listeners,
+        image: artist.image,
+        url: artist.url,
+      }));
+
+    return [...trackResults, ...artistResults]
+      .filter((result) => this.matchesQuery(result, query));
+  }
+
+  private matchesQuery(result: SearchResult, query: string): boolean {
+    const normalizedTitle = result.title.toLowerCase();
+    const normalizedSubtitle = result.subtitle.toLowerCase();
+    const normalizedQuery = query.toLowerCase();
+    return normalizedTitle.includes(normalizedQuery) || normalizedSubtitle.includes(normalizedQuery);
+  }
+
+  private buildLastFmArtistUrl(artist: string): string {
+    return `https://www.last.fm/music/${encodeURIComponent(artist).replace(/%20/g, '+')}`;
+  }
+
+  private buildLastFmTrackUrl(track: BeatflowTrack): string {
+    const artist = encodeURIComponent(track.artist).replace(/%20/g, '+');
+    const trackName = encodeURIComponent(track.name).replace(/%20/g, '+');
+    return `https://www.last.fm/music/${artist}/_/${trackName}`;
   }
 }
 
@@ -628,14 +567,14 @@ export class ArtistDetailPageComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private popularArtistsService: PopularArtistsService,
+    private beatflowExploreService: BeatflowExploreService,
   ) {}
 
   ngOnInit(): void {
     this.route.paramMap
       .pipe(
         map((params: ParamMap) => params.get('artistName') || ''),
-        switchMap((artistName: string) => this.popularArtistsService.getArtistDetail(artistName)),
+        switchMap((artistName: string) => this.getArtistDetail(artistName)),
         takeUntil(this.destroy$),
       )
       .subscribe((artist) => {
@@ -647,6 +586,33 @@ export class ArtistDetailPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private getArtistDetail(artistName: string): Observable<ArtistDetail> {
+    const fallbackArtist = FALLBACK_ARTISTS.find((artist) => artist.name === artistName) || FALLBACK_ARTISTS[0];
+
+    return this.beatflowExploreService.getArtistDetail(artistName).pipe(
+      map((artist) => this.mapArtistDetail(artist)),
+      catchError(() => of({
+        ...fallbackArtist,
+        summary: `${fallbackArtist.name} es uno de los artistas mas populares del momento en BeatFlow.`,
+      })),
+    );
+  }
+
+  private mapArtistDetail(artist: BeatflowArtistDetail): ArtistDetail {
+    return {
+      name: artist.name,
+      image: artist.imageUrl || PLACEHOLDER_IMAGE,
+      playcount: Number(artist.playcount) || 0,
+      listeners: Number(artist.listeners) || 0,
+      summary: this.toPlainText(artist.summary || artist.content || 'Sin descripcion disponible.'),
+      url: `https://www.last.fm/music/${encodeURIComponent(artist.name).replace(/%20/g, '+')}`,
+    };
+  }
+
+  private toPlainText(text: string): string {
+    return text.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
   }
 }
 
