@@ -4,6 +4,8 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { NbButtonModule, NbCardModule, NbInputModule, NbToastrModule, NbToastrService } from '@nebular/theme';
 
+import { BeatflowAuthService } from '../../@core/services';
+
 interface UserProfile {
   name: string;
   email: string;
@@ -232,15 +234,18 @@ export class ProfilePageComponent implements OnInit {
     return AVATAR_COLORS[idx];
   }
 
-  constructor(private toastr: NbToastrService) {}
+  constructor(
+    private toastr: NbToastrService,
+    private authService: BeatflowAuthService,
+  ) {}
 
   ngOnInit(): void {
-    const session = localStorage.getItem('bf_session');
+    const session = this.authService.getSession();
     const storedProfile = localStorage.getItem('bf_profile');
     if (session) {
-      const { email, name } = JSON.parse(session);
-      this.profile.email = email || '';
-      this.profile.name = name || DEFAULT_PROFILE.name;
+      this.profile.email = session.email || session.user.email || '';
+      this.profile.name = session.name || session.user.name || DEFAULT_PROFILE.name;
+      this.profile.avatar = session.photo || session.user.photo || '';
     }
     if (storedProfile) {
       this.profile = { ...this.profile, ...JSON.parse(storedProfile) };
@@ -268,7 +273,14 @@ export class ProfilePageComponent implements OnInit {
     const session = localStorage.getItem('bf_session');
     if (session) {
       const s = JSON.parse(session);
-      localStorage.setItem('bf_session', JSON.stringify({ ...s, name: this.profile.name }));
+      localStorage.setItem('bf_session', JSON.stringify({
+        ...s,
+        name: this.profile.name,
+        user: {
+          ...s.user,
+          name: this.profile.name,
+        },
+      }));
     }
     this.toastr.success('Perfil actualizado correctamente.', 'BeatFlow');
   }
@@ -281,4 +293,3 @@ const routes: Routes = [{ path: '', component: ProfilePageComponent }];
   declarations: [ProfilePageComponent],
 })
 export class ProfileModule {}
-

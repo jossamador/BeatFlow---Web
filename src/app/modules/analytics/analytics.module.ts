@@ -1,7 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgModule } from '@angular/core';
+import { Component, NgModule, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { NbCardModule } from '@nebular/theme';
+import { Subject, of } from 'rxjs';
+import { catchError, map, takeUntil } from 'rxjs/operators';
+
+import { BeatflowArtist, BeatflowExploreService } from '../../@core/services';
 
 interface StatBar {
   label: string;
@@ -14,6 +18,15 @@ interface WeekDay {
   day: string;
   minutes: number;
 }
+
+interface TopArtist {
+  name: string;
+  genre: string;
+  plays: number;
+  color: string;
+}
+
+const ARTIST_COLORS = ['#ff2d4b', '#ff6b1a', '#00d4ff', '#ffab00', '#7c3aed'];
 
 @Component({
   selector: 'ngx-bf-analytics-page',
@@ -83,7 +96,7 @@ interface WeekDay {
                 <small>{{ a.genre }}</small>
               </div>
               <div class="top-bar-mini">
-                <div class="top-bar-fill" [style.width]="(a.plays / 60 * 100) + '%'" [style.background]="a.color"></div>
+                <div class="top-bar-fill" [style.width]="(a.plays / maxArtistPlays * 100) + '%'" [style.background]="a.color"></div>
               </div>
               <span class="top-plays">{{ a.plays }} plays</span>
             </div>
@@ -245,7 +258,9 @@ interface WeekDay {
     }
   `],
 })
-export class AnalyticsPageComponent {
+export class AnalyticsPageComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   kpis = [
     { icon: '⏱', value: '4h 32m', label: 'Tiempo esta semana' },
     { icon: '🎵', value: '87', label: 'Canciones escuchadas' },
@@ -275,13 +290,57 @@ export class AnalyticsPageComponent {
     return Math.max(...this.weekActivity.map((w) => w.minutes));
   }
 
-  topArtists = [
+  get maxArtistPlays(): number {
+    return Math.max(...this.topArtists.map((artist) => artist.plays), 1);
+  }
+
+  topArtists: TopArtist[] = [
     { name: 'Bad Bunny', genre: 'Reggaeton', plays: 58, color: '#ff2d4b' },
     { name: 'The Weeknd', genre: 'R&B / Pop', plays: 47, color: '#ff6b1a' },
     { name: 'Kendrick Lamar', genre: 'Hip-Hop', plays: 39, color: '#00d4ff' },
     { name: 'Karol G', genre: 'Reggaeton', plays: 33, color: '#ffab00' },
     { name: 'Drake', genre: 'Hip-Hop', plays: 28, color: '#ff6b1a' },
   ];
+
+  constructor(private beatflowExploreService: BeatflowExploreService) {}
+
+  ngOnInit(): void {
+    this.beatflowExploreService.getTopArtists(5)
+      .pipe(
+        map((artists) => artists.map((artist, index) => this.mapTopArtist(artist, index))),
+        catchError(() => of(this.topArtists)),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((artists) => {
+        this.topArtists = artists;
+        this.kpis[2].value = String(artists.length);
+      });
+
+    this.beatflowExploreService.getTrendingTracks(25)
+      .pipe(
+        catchError(() => of([])),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((tracks) => {
+        if (tracks.length) {
+          this.kpis[1].value = String(tracks.length);
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private mapTopArtist(artist: BeatflowArtist, index: number): TopArtist {
+    return {
+      name: artist.name,
+      genre: 'Tendencia global',
+      plays: Math.max(Math.round((Number(artist.playcount) || Number(artist.listeners) || 0) / 1000000), 1),
+      color: ARTIST_COLORS[index % ARTIST_COLORS.length],
+    };
+  }
 }
 
 const routes: Routes = [{ path: '', component: AnalyticsPageComponent }];
@@ -291,4 +350,3 @@ const routes: Routes = [{ path: '', component: AnalyticsPageComponent }];
   declarations: [AnalyticsPageComponent],
 })
 export class AnalyticsModule {}
-

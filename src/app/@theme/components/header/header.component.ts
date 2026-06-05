@@ -1,9 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NbMediaBreakpointsService, NbMenuService, NbSidebarService, NbThemeService } from '@nebular/theme';
+import { Router } from '@angular/router';
 
 import { UserData } from '../../../@core/data/users';
 import { LayoutService } from '../../../@core/utils';
-import { map, takeUntil } from 'rxjs/operators';
+import { BeatflowAuthService } from '../../../@core/services';
+import { filter, map, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -38,14 +40,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   currentTheme = 'default';
 
-  userMenu = [ { title: 'Profile' }, { title: 'Log out' } ];
+  userMenu = [ { title: 'Perfil', link: '/pages/profile' }, { title: 'Cerrar sesion' } ];
 
   constructor(private sidebarService: NbSidebarService,
               private menuService: NbMenuService,
               private themeService: NbThemeService,
               private userService: UserData,
               private layoutService: LayoutService,
-              private breakpointService: NbMediaBreakpointsService) {
+              private breakpointService: NbMediaBreakpointsService,
+              private authService: BeatflowAuthService,
+              private router: Router) {
   }
 
   ngOnInit() {
@@ -53,7 +57,32 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     this.userService.getUsers()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((users: any) => this.user = users.nick);
+      .subscribe((users: any) => {
+        if (!this.authService.getSession()) {
+          this.user = users.nick;
+        }
+      });
+
+    this.authService.session$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((session) => {
+        if (session) {
+          this.user = {
+            name: session.name,
+            picture: session.photo || session.user.photo || '',
+          };
+        }
+      });
+
+    this.menuService.onItemClick()
+      .pipe(
+        filter(({ item }) => item.title === 'Cerrar sesion'),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(() => {
+        this.authService.logout();
+        void this.router.navigate(['/auth/login']);
+      });
 
     const { xl } = this.breakpointService.getBreakpointsMap();
     this.themeService.onMediaQueryChange()

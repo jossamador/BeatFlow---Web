@@ -9,88 +9,105 @@ import {
   NbFormFieldModule,
   NbIconModule,
   NbInputModule,
+  NbLayoutModule,
   NbToastrModule,
+  NbToastrService,
 } from '@nebular/theme';
 import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
+import { BeatflowAuthService } from '../../@core/services';
 import { RegisterComponent } from './register/register.component';
 
 @Component({
   selector: 'ngx-bf-login-page',
   template: `
-    <section class="auth-shell">
-      <div class="auth-brand">
-        <div class="brand-logo">
-          <span class="logo-mark">Beat</span><span class="logo-accent">Flow</span>
-        </div>
-        <p class="brand-tagline">Tu música. Tus tendencias.</p>
-        <div class="brand-features">
-          <div class="feat-item"><span class="feat-icon">🎵</span> Canciones en tendencia</div>
-          <div class="feat-item"><span class="feat-icon">🎤</span> Artistas populares</div>
-          <div class="feat-item"><span class="feat-icon">📊</span> Tu analítica musical</div>
-        </div>
-      </div>
-
-      <div class="auth-card-wrap">
-        <div class="auth-card">
-          <h1 class="auth-title">Bienvenido de nuevo</h1>
-          <p class="auth-sub">Inicia sesión para continuar</p>
-
-          <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
-            <div class="field-group">
-              <label class="field-label">Correo electrónico</label>
-              <input
-                nbInput
-                fullWidth
-                formControlName="email"
-                type="email"
-                placeholder="tu@correo.com"
-              />
-              <span class="field-error" *ngIf="email.invalid && email.touched">
-                <span *ngIf="email.errors?.['required']">El correo es obligatorio.</span>
-                <span *ngIf="email.errors?.['email']">Correo inválido.</span>
-              </span>
+    <nb-layout class="auth-layout">
+      <nb-layout-column class="auth-layout-column">
+        <section class="auth-shell">
+          <div class="auth-brand">
+            <div class="brand-logo">
+              <span class="logo-mark">Beat</span><span class="logo-accent">Flow</span>
             </div>
+            <p class="brand-tagline">Tu música. Tus tendencias.</p>
+            <div class="brand-features">
+              <div class="feat-item"><span class="feat-icon">🎵</span> Canciones en tendencia</div>
+              <div class="feat-item"><span class="feat-icon">🎤</span> Artistas populares</div>
+              <div class="feat-item"><span class="feat-icon">📊</span> Tu analítica musical</div>
+            </div>
+          </div>
 
-            <div class="field-group">
-              <label class="field-label">Contraseña</label>
-              <div class="password-wrap">
-                <input
-                  nbInput
-                  fullWidth
-                  formControlName="password"
-                  [type]="showPwd ? 'text' : 'password'"
-                  placeholder="Mínimo 6 caracteres"
-                />
-                <button type="button" class="toggle-pwd" (click)="showPwd = !showPwd">
-                  {{ showPwd ? '🙈' : '👁' }}
+          <div class="auth-card-wrap">
+            <div class="auth-card">
+              <h1 class="auth-title">Bienvenido de nuevo</h1>
+              <p class="auth-sub">Inicia sesión para continuar</p>
+
+              <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
+                <div class="field-group">
+                  <label class="field-label">Correo electrónico</label>
+                  <input
+                    nbInput
+                    fullWidth
+                    formControlName="email"
+                    type="email"
+                    placeholder="tu@correo.com"
+                  />
+                  <span class="field-error" *ngIf="email.invalid && email.touched">
+                    <span *ngIf="email.errors?.['required']">El correo es obligatorio.</span>
+                    <span *ngIf="email.errors?.['email']">Correo inválido.</span>
+                  </span>
+                </div>
+
+                <div class="field-group">
+                  <label class="field-label">Contraseña</label>
+                  <div class="password-wrap">
+                    <input
+                      nbInput
+                      fullWidth
+                      formControlName="password"
+                      [type]="showPwd ? 'text' : 'password'"
+                      placeholder="Mínimo 8 caracteres"
+                    />
+                    <button type="button" class="toggle-pwd" (click)="showPwd = !showPwd">
+                      {{ showPwd ? '🙈' : '👁' }}
+                    </button>
+                  </div>
+                  <span class="field-error" *ngIf="password.invalid && password.touched">
+                    Contraseña obligatoria (mín. 8 caracteres).
+                  </span>
+                </div>
+
+                <button nbButton status="primary" fullWidth type="submit" [disabled]="form.invalid || loading">
+                  {{ loading ? 'Ingresando...' : 'Iniciar sesión' }}
                 </button>
-              </div>
-              <span class="field-error" *ngIf="password.invalid && password.touched">
-                Contraseña obligatoria (mín. 6 caracteres).
-              </span>
+
+                <div class="divider"><span>o</span></div>
+
+                <button nbButton fullWidth type="button" class="guest-btn" (click)="enterAsGuest()">
+                  <i class="fas fa-user-secret"></i> Entrar como invitado
+                </button>
+
+                <p class="auth-footer-text">
+                  ¿No tienes cuenta?
+                  <a routerLink="/auth/register" class="auth-link">Regístrate gratis</a>
+                </p>
+              </form>
             </div>
-
-            <button nbButton status="primary" fullWidth type="submit" [disabled]="form.invalid || loading">
-              {{ loading ? 'Ingresando...' : 'Iniciar sesión' }}
-            </button>
-
-            <div class="divider"><span>o</span></div>
-
-            <button nbButton fullWidth type="button" class="guest-btn" (click)="enterAsGuest()">
-              <i class="fas fa-user-secret"></i> Entrar como invitado
-            </button>
-
-            <p class="auth-footer-text">
-              ¿No tienes cuenta?
-              <a routerLink="/auth/register" class="auth-link">Regístrate gratis</a>
-            </p>
-          </form>
-        </div>
-      </div>
-    </section>
+          </div>
+        </section>
+      </nb-layout-column>
+    </nb-layout>
   `,
   styles: [`
+    :host ::ng-deep nb-layout.auth-layout nb-layout-column.auth-layout-column {
+      padding: 0 !important;
+    }
+
+    :host ::ng-deep nb-layout.auth-layout .layout {
+      min-height: 100vh;
+      background: #070d1a;
+    }
+
     .auth-shell {
       min-height: 100vh;
       display: grid;
@@ -259,7 +276,7 @@ import { RegisterComponent } from './register/register.component';
 export class LoginPageComponent implements OnDestroy {
   form = new FormGroup({
     email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
-    password: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(6)] }),
+    password: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(8)] }),
   });
 
   showPwd = false;
@@ -269,56 +286,73 @@ export class LoginPageComponent implements OnDestroy {
   get email(): AbstractControl { return this.form.get('email')!; }
   get password(): AbstractControl { return this.form.get('password')!; }
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: BeatflowAuthService,
+    private toastrService: NbToastrService,
+  ) {}
 
   submit(): void {
-    if (this.form.invalid) return;
+    this.form.markAllAsTouched();
+
+    if (this.form.invalid || this.loading) {
+      return;
+    }
+
     this.loading = true;
-    setTimeout(() => {
-      this.loading = false;
-      const stored = localStorage.getItem('bf_users');
-      const users: Array<{ email: string; password: string; name?: string }> = stored ? JSON.parse(stored) : [];
-      const match = users.find((u) => u.email === this.email.value && u.password === this.password.value);
-      if (match) {
-        localStorage.setItem('bf_session', JSON.stringify({ email: match.email, name: match.name || match.email }));
-        this.router.navigate(['/dashboard']);
-      } else {
-        this.loading = false;
-        alert('Correo o contraseña incorrectos.');
-      }
-    }, 700);
+
+    this.authService.login({
+      email: this.email.value,
+      password: this.password.value,
+    })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.loading = false;
+          this.toastrService.success('Sesion iniciada correctamente.', 'BeatFlow', { duration: 3500 });
+          void this.router.navigate(['/pages/dashboard']);
+        },
+        error: () => {
+          this.loading = false;
+        },
+      });
   }
 
   ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 
   enterAsGuest(): void {
-    localStorage.setItem('bf_session', JSON.stringify({ email: 'guest@beatflow.app', name: 'Invitado' }));
-    this.router.navigate(['/dashboard']);
+    this.authService.enterAsGuest();
+    this.toastrService.info('Entraste como invitado.', 'BeatFlow', { duration: 3000 });
+    void this.router.navigate(['/pages/dashboard']);
   }
 }
 
 @Component({
   selector: 'ngx-bf-auth-page',
   template: `
-    <section class="auth-shell">
-      <div class="auth-brand">
-        <div class="brand-logo">
-          <span class="logo-mark">Beat</span><span class="logo-accent">Flow</span>
-        </div>
-        <p class="brand-tagline">Tu música. Tus tendencias.</p>
-      </div>
-      <div class="auth-card-wrap">
-        <div class="auth-card">
-          <h1 class="auth-title">{{ title }}</h1>
-          <p class="auth-sub">{{ description }}</p>
-          <p class="auth-footer-text" style="margin-top:1.5rem">
-            <a routerLink="/auth/login" class="auth-link">← Volver al inicio de sesión</a>
-          </p>
-        </div>
-      </div>
-    </section>
+    <nb-layout class="auth-layout">
+      <nb-layout-column class="auth-layout-column">
+        <section class="auth-shell">
+          <div class="auth-brand">
+            <div class="brand-logo">
+              <span class="logo-mark">Beat</span><span class="logo-accent">Flow</span>
+            </div>
+            <p class="brand-tagline">Tu música. Tus tendencias.</p>
+          </div>
+          <div class="auth-card-wrap">
+            <div class="auth-card">
+              <h1 class="auth-title">{{ title }}</h1>
+              <p class="auth-sub">{{ description }}</p>
+              <p class="auth-footer-text" style="margin-top:1.5rem">
+                <a routerLink="/auth/login" class="auth-link">← Volver al inicio de sesión</a>
+              </p>
+            </div>
+          </div>
+        </section>
+      </nb-layout-column>
+    </nb-layout>
   `,
-  styles: [`.auth-shell{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;background:radial-gradient(ellipse at 10% 80%,rgba(255,77,109,.22),transparent 52%),radial-gradient(ellipse at 88% 18%,rgba(124,58,237,.22),transparent 52%),#070d1a}.auth-brand{display:flex;flex-direction:column;justify-content:center;padding:4rem 3rem}.brand-logo{font-size:3.5rem;font-weight:900;letter-spacing:-.02em;line-height:1}.logo-mark{color:#f8fafc}.logo-accent{color:#ff4d6d}.brand-tagline{margin:1rem 0 0;font-size:1.25rem;color:rgba(248,250,252,.65)}.auth-card-wrap{display:flex;align-items:center;justify-content:center;padding:2rem}.auth-card{width:100%;max-width:420px;background:rgba(17,28,54,.92);border:1px solid rgba(148,163,184,.15);border-radius:1.5rem;padding:2.5rem}.auth-title{margin:0 0 .35rem;font-size:1.85rem;font-weight:800;color:#f8fafc}.auth-sub{margin:0;color:rgba(148,163,184,.85)}.auth-footer-text{margin:0;text-align:center;font-size:.88rem;color:rgba(148,163,184,.8)}.auth-link{color:#ff4d6d;font-weight:700;text-decoration:none}@media(max-width:768px){.auth-shell{grid-template-columns:1fr}.auth-brand{display:none}}`],
+  styles: [`:host ::ng-deep nb-layout.auth-layout nb-layout-column.auth-layout-column{padding:0!important}:host ::ng-deep nb-layout.auth-layout .layout{min-height:100vh;background:#070d1a}.auth-shell{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;background:radial-gradient(ellipse at 10% 80%,rgba(255,77,109,.22),transparent 52%),radial-gradient(ellipse at 88% 18%,rgba(124,58,237,.22),transparent 52%),#070d1a}.auth-brand{display:flex;flex-direction:column;justify-content:center;padding:4rem 3rem}.brand-logo{font-size:3.5rem;font-weight:900;letter-spacing:-.02em;line-height:1}.logo-mark{color:#f8fafc}.logo-accent{color:#ff4d6d}.brand-tagline{margin:1rem 0 0;font-size:1.25rem;color:rgba(248,250,252,.65)}.auth-card-wrap{display:flex;align-items:center;justify-content:center;padding:2rem}.auth-card{width:100%;max-width:420px;background:rgba(17,28,54,.92);border:1px solid rgba(148,163,184,.15);border-radius:1.5rem;padding:2.5rem}.auth-title{margin:0 0 .35rem;font-size:1.85rem;font-weight:800;color:#f8fafc}.auth-sub{margin:0;color:rgba(148,163,184,.85)}.auth-footer-text{margin:0;text-align:center;font-size:.88rem;color:rgba(148,163,184,.8)}.auth-link{color:#ff4d6d;font-weight:700;text-decoration:none}@media(max-width:768px){.auth-shell{grid-template-columns:1fr}.auth-brand{display:none}}`],
 })
 export class AuthPageComponent {
   title = this.route.snapshot.data['title'] || 'BeatFlow';
@@ -348,6 +382,7 @@ const routes: Routes = [
     NbIconModule,
     NbButtonModule,
     NbAlertModule,
+    NbLayoutModule,
     NbToastrModule,
   ],
   declarations: [AuthPageComponent, LoginPageComponent, RegisterComponent],

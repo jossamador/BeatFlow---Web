@@ -1,6 +1,6 @@
 import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NbAuthModule, NbDummyAuthStrategy } from '@nebular/auth';
 import { NbSecurityModule, NbRoleProvider } from '@nebular/security';
 import { of as observableOf } from 'rxjs';
@@ -53,6 +53,7 @@ import { StatsProgressBarService } from './mock/stats-progress-bar.service';
 import { VisitorsAnalyticsService } from './mock/visitors-analytics.service';
 import { SecurityCamerasService } from './mock/security-cameras.service';
 import { MockDataModule } from './mock/mock-data.module';
+import { BeatflowHttpInterceptor } from './interceptors/beatflow-http.interceptor';
 
 const socialLinks = [
   {
@@ -137,6 +138,11 @@ export const NB_CORE_PROVIDERS = [
 
   {
     provide: NbRoleProvider, useClass: NbSimpleRoleProvider,
+  },
+  {
+    provide: HTTP_INTERCEPTORS,
+    useClass: BeatflowHttpInterceptor,
+    multi: true,
   },
   AnalyticsService,
   LayoutService,

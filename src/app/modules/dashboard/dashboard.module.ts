@@ -1,39 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Component, NgModule, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { NbCardModule, NbListModule } from '@nebular/theme';
-import { Observable, Subject, of } from 'rxjs';
+import { Subject, of } from 'rxjs';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 
-import { environment } from '../../../environments/environment';
-
-interface LastFmTrackImage {
-  size: string;
-  '#text': string;
-}
-
-interface LastFmTrack {
-  name: string;
-  playcount: string;
-  artist: {
-    name: string;
-  };
-  image: LastFmTrackImage[];
-  url: string;
-}
-
-interface LastFmTopTracksResponse {
-  tracks: {
-    track: LastFmTrack[];
-  };
-}
+import { BeatflowExploreService, BeatflowTrack } from '../../@core/services';
 
 interface TrendingTrack {
   rank: number;
   title: string;
   artist: string;
   playcount: number;
+  listeners: number;
   cover: string;
   url: string;
 }
@@ -44,6 +23,7 @@ const FALLBACK_TRACKS: TrendingTrack[] = [
     title: 'Midnight Pulse',
     artist: 'BeatFlow Sessions',
     playcount: 128400,
+    listeners: 22400,
     cover: 'https://placehold.co/96x96/ff4d6d/ffffff?text=B',
     url: '#',
   },
@@ -52,6 +32,7 @@ const FALLBACK_TRACKS: TrendingTrack[] = [
     title: 'Neon Lights',
     artist: 'BeatFlow Sessions',
     playcount: 113900,
+    listeners: 18840,
     cover: 'https://placehold.co/96x96/2dd4bf/0f172a?text=F',
     url: '#',
   },
@@ -60,41 +41,11 @@ const FALLBACK_TRACKS: TrendingTrack[] = [
     title: 'Skyline Dreams',
     artist: 'BeatFlow Sessions',
     playcount: 98750,
+    listeners: 17320,
     cover: 'https://placehold.co/96x96/7c3aed/ffffff?text=W',
     url: '#',
   },
 ];
-
-class TrendingTracksService {
-  constructor(private http: HttpClient) {}
-
-  getTrendingTracks(): Observable<TrendingTrack[]> {
-    if (!environment.lastFm.apiKey) {
-      return of(FALLBACK_TRACKS);
-    }
-
-    return this.http
-      .get<LastFmTopTracksResponse>(`${environment.lastFm.baseUrl}?method=chart.gettoptracks&limit=10&api_key=${environment.lastFm.apiKey}&format=json`)
-      .pipe(
-        map((response) => response.tracks.track.map((track, index) => this.mapTrack(track, index))),
-        catchError(() => of(FALLBACK_TRACKS)),
-      );
-  }
-
-  private mapTrack(track: LastFmTrack, index: number): TrendingTrack {
-    const image = [...track.image].reverse().find((item) => item['#text'])?.['#text']
-      || 'https://placehold.co/96x96/1e293b/f8fafc?text=BF';
-
-    return {
-      rank: index + 1,
-      title: track.name,
-      artist: track.artist.name,
-      playcount: Number(track.playcount) || 0,
-      cover: image,
-      url: track.url,
-    };
-  }
-}
 
 @Component({
   selector: 'ngx-bf-dashboard-page',
@@ -396,13 +347,15 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   description = 'Panel principal para tendencias, rankings y métricas visuales de BeatFlow.';
   trendingTracks: TrendingTrack[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private beatflowExploreService: BeatflowExploreService) {}
 
   ngOnInit(): void {
-    const service = new TrendingTracksService(this.http);
-
-    service.getTrendingTracks()
-      .pipe(takeUntil(this.destroy$))
+    this.beatflowExploreService.getTrendingTracks(10)
+      .pipe(
+        map((tracks) => tracks.map((track, index) => this.mapTrack(track, index))),
+        catchError(() => of(FALLBACK_TRACKS)),
+        takeUntil(this.destroy$),
+      )
       .subscribe((tracks) => {
         this.trendingTracks = tracks;
       });
@@ -423,6 +376,24 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   get topTrackTitle(): string {
     return this.trendingTracks[0]?.title || 'Sin datos';
+  }
+
+  private mapTrack(track: BeatflowTrack, index: number): TrendingTrack {
+    return {
+      rank: track.rank || index + 1,
+      title: track.name,
+      artist: track.artist,
+      playcount: Number(track.playcount) || 0,
+      listeners: Number(track.listeners) || 0,
+      cover: track.imageUrl || 'https://placehold.co/96x96/1e293b/f8fafc?text=BF',
+      url: this.buildLastFmTrackUrl(track),
+    };
+  }
+
+  private buildLastFmTrackUrl(track: BeatflowTrack): string {
+    const artist = encodeURIComponent(track.artist).replace(/%20/g, '+');
+    const trackName = encodeURIComponent(track.name).replace(/%20/g, '+');
+    return `https://www.last.fm/music/${artist}/_/${trackName}`;
   }
 }
 
