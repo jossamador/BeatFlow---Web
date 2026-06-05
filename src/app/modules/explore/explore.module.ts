@@ -356,7 +356,7 @@ class PopularArtistsService {
                   status="primary"
                   size="small"
                   *ngIf="result.type === 'artist'; else openResultLink"
-                  [routerLink]="['/explore', result.title]"
+                  [routerLink]="['/pages/explore', result.title]"
                 >
                   Ver detalle
                 </a>
@@ -389,7 +389,7 @@ class PopularArtistsService {
             </div>
           </nb-card-body>
           <nb-card-footer>
-            <a nbButton status="primary" [routerLink]="['/explore', artist.name]">
+            <a nbButton status="primary" [routerLink]="['/pages/explore', artist.name]">
               Ver detalle
             </a>
           </nb-card-footer>
