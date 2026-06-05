@@ -13,7 +13,7 @@ interface Playlist {
   tracks: number;
 }
 
-const COVER_COLORS = ['#ff4d6d', '#2dd4bf', '#7c3aed', '#f59e0b', '#38bdf8', '#10b981'];
+const COVER_COLORS = ['#ff2d4b', '#ff6b1a', '#ffab00', '#00d4ff', '#ff2d4b', '#ff6b1a'];
 
 @Component({
   selector: 'ngx-bf-playlists-page',
@@ -100,12 +100,12 @@ const COVER_COLORS = ['#ff4d6d', '#2dd4bf', '#7c3aed', '#f59e0b', '#38bdf8', '#1
       font-size: 0.75rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: #2dd4bf;
+      color: #ff6b1a;
       margin-bottom: 0.4rem;
     }
 
-    h1 { margin: 0; font-size: 2.2rem; font-weight: 800; color: #f8fafc; }
-    h1 + p { margin: 0.4rem 0 0; color: rgba(148,163,184,.8); font-size: 0.95rem; }
+    h1 { margin: 0; font-size: 2.2rem; font-weight: 800; color: #f0f4ff; }
+    h1 + p { margin: 0.4rem 0 0; color: rgba(240,244,255,.65); font-size: 0.95rem; }
 
     .card-title { margin: 0; font-size: 1.1rem; font-weight: 700; color: #f8fafc; }
 
@@ -122,8 +122,8 @@ const COVER_COLORS = ['#ff4d6d', '#2dd4bf', '#7c3aed', '#f59e0b', '#38bdf8', '#1
     }
 
     .playlist-card {
-      background: rgba(17,28,54,.85);
-      border: 1px solid rgba(148,163,184,.12);
+      background: rgba(7,8,15,0.7);
+      border: 1px solid rgba(255,255,255,0.08);
       border-radius: 1rem;
       padding: 1.25rem;
       display: grid;
@@ -135,7 +135,7 @@ const COVER_COLORS = ['#ff4d6d', '#2dd4bf', '#7c3aed', '#f59e0b', '#38bdf8', '#1
     }
 
     .playlist-card:hover {
-      border-color: rgba(255,77,109,.4);
+      border-color: rgba(255,45,75,.4);
       transform: translateY(-2px);
     }
 
@@ -162,7 +162,7 @@ const COVER_COLORS = ['#ff4d6d', '#2dd4bf', '#7c3aed', '#f59e0b', '#38bdf8', '#1
       margin: 0;
       font-size: 0.95rem;
       font-weight: 700;
-      color: #f8fafc;
+      color: #f0f4ff;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -171,13 +171,13 @@ const COVER_COLORS = ['#ff4d6d', '#2dd4bf', '#7c3aed', '#f59e0b', '#38bdf8', '#1
     .pl-desc {
       margin: 0.15rem 0 0.3rem;
       font-size: 0.8rem;
-      color: rgba(148,163,184,.75);
+      color: rgba(240,244,255,.6);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .pl-meta { font-size: 0.72rem; color: rgba(148,163,184,.55); }
+    .pl-meta { font-size: 0.72rem; color: rgba(240,244,255,.4); }
 
     .pl-delete {
       background: none;

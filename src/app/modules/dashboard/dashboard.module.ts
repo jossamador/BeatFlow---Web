@@ -181,16 +181,16 @@ class TrendingTracksService {
 
     .hero-card p {
       margin: 0.5rem 0 0;
-      color: rgba(255, 255, 255, 0.82);
+      color: rgba(240,244,255,0.72);
       line-height: 1.6;
     }
 
     .hero-card {
       background:
-        radial-gradient(circle at 82% 18%, rgba(45, 212, 191, 0.25), transparent 36%),
-        radial-gradient(circle at 20% 90%, rgba(255, 77, 109, 0.28), transparent 40%),
-        linear-gradient(135deg, #15182f 0%, #0f1225 52%, #0a0c18 100%);
-      border: 1px solid rgba(148, 163, 184, 0.2);
+        radial-gradient(circle at 82% 18%, rgba(0,212,255,.18), transparent 36%),
+        radial-gradient(circle at 20% 90%, rgba(255,45,75,.28), transparent 40%),
+        linear-gradient(135deg, #0d0f1e 0%, #09091a 52%, #04050a 100%);
+      border: 1px solid rgba(255,255,255,0.08);
     }
 
     .hero-grid {
@@ -207,8 +207,8 @@ class TrendingTracksService {
     }
 
     .kpi-item {
-      background: rgba(15, 23, 42, 0.48);
-      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(7,8,15,0.6);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 0.75rem;
       padding: 0.65rem;
       min-height: 4.7rem;
@@ -218,14 +218,14 @@ class TrendingTracksService {
     }
 
     .kpi-item small {
-      color: rgba(241, 245, 249, 0.75);
+      color: rgba(240,244,255,0.6);
       font-size: 0.68rem;
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }
 
     .kpi-item strong {
-      color: #f8fafc;
+      color: #f0f4ff;
       font-size: 1.02rem;
       white-space: nowrap;
       overflow: hidden;
@@ -238,7 +238,7 @@ class TrendingTracksService {
       font-size: 0.75rem;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: #7dd3fc;
+      color: #ff6b1a;
     }
 
     h1, h2 {
@@ -266,8 +266,8 @@ class TrendingTracksService {
     .live-chip {
       padding: 0.35rem 0.7rem;
       border-radius: 999px;
-      background: rgba(45, 212, 191, 0.12);
-      color: #2dd4bf;
+      background: rgba(255,107,26,0.12);
+      color: #ff6b1a;
       font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 0.04em;
@@ -290,9 +290,9 @@ class TrendingTracksService {
       align-items: center;
       gap: 0.75rem;
       padding: 0.6rem 0.75rem;
-      border: 1px solid rgba(148, 163, 184, 0.14);
+      border: 1px solid rgba(255,255,255,0.07);
       border-radius: 0.65rem;
-      background: rgba(15, 23, 42, 0.28);
+      background: rgba(7,8,15,0.4);
       min-height: 0;
     }
 
@@ -349,14 +349,14 @@ class TrendingTracksService {
     }
 
     .trend-icon {
-      color: #2dd4bf;
+      color: #00d4ff;
       font-weight: 900;
       font-size: 1rem;
       line-height: 1;
     }
 
     .track-link {
-      color: #38bdf8;
+      color: #00d4ff;
       text-decoration: none;
       font-weight: 700;
       font-size: 0.84rem;

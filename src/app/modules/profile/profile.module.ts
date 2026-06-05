@@ -20,7 +20,7 @@ const DEFAULT_PROFILE: UserProfile = {
   avatar: '',
 };
 
-const AVATAR_COLORS = ['#ff4d6d', '#2dd4bf', '#7c3aed', '#f59e0b', '#38bdf8'];
+const AVATAR_COLORS = ['#ff2d4b', '#ff6b1a', '#ffab00', '#00d4ff', '#ff2d4b'];
 const GENRES = ['Pop', 'Rock', 'Reggaeton', 'Hip-Hop', 'Electronic', 'Jazz', 'Classical', 'R&B', 'Latin'];
 
 @Component({
@@ -102,10 +102,10 @@ const GENRES = ['Pop', 'Rock', 'Reggaeton', 'Hip-Hop', 'Electronic', 'Jazz', 'Cl
 
     .profile-hero {
       background:
-        radial-gradient(ellipse at 80% 50%, rgba(124,58,237,.22), transparent 55%),
-        radial-gradient(ellipse at 20% 50%, rgba(255,77,109,.18), transparent 55%),
-        rgba(17,28,54,.7);
-      border: 1px solid rgba(148,163,184,.12);
+        radial-gradient(ellipse at 80% 50%, rgba(255,107,26,.18), transparent 55%),
+        radial-gradient(ellipse at 20% 50%, rgba(255,45,75,.18), transparent 55%),
+        rgba(7,8,15,0.7);
+      border: 1px solid rgba(255,255,255,0.08);
       border-radius: 1.25rem;
       padding: 2rem;
     }
@@ -131,16 +131,16 @@ const GENRES = ['Pop', 'Rock', 'Reggaeton', 'Hip-Hop', 'Electronic', 'Jazz', 'Cl
       border: 3px solid rgba(255,255,255,.15);
     }
 
-    .avatar-info h1 { margin: 0; font-size: 1.8rem; font-weight: 800; color: #f8fafc; }
-    .avatar-info p { margin: 0.3rem 0 0; color: rgba(148,163,184,.8); font-size: 0.9rem; }
+    .avatar-info h1 { margin: 0; font-size: 1.8rem; font-weight: 800; color: #f0f4ff; }
+    .avatar-info p { margin: 0.3rem 0 0; color: rgba(240,244,255,.65); font-size: 0.9rem; }
 
     .genre-badge {
       display: inline-block;
       margin-top: 0.5rem;
       padding: 0.2rem 0.65rem;
       border-radius: 999px;
-      background: rgba(255,77,109,.18);
-      color: #ff4d6d;
+      background: rgba(255,45,75,.18);
+      color: #ff2d4b;
       font-size: 0.75rem;
       font-weight: 700;
     }
@@ -171,9 +171,9 @@ const GENRES = ['Pop', 'Rock', 'Reggaeton', 'Hip-Hop', 'Electronic', 'Jazz', 'Cl
     }
 
     .genre-btn.active {
-      background: rgba(255,77,109,.18);
-      border-color: #ff4d6d;
-      color: #ff4d6d;
+      background: rgba(255,45,75,.18);
+      border-color: #ff2d4b;
+      color: #ff2d4b;
       font-weight: 700;
     }
 

@@ -13,7 +13,7 @@
     border-right: 1px solid rgba(255,255,255,0.07) !important;
   }
 
-  /* Waveform accent strip at top of sidebar */
+  /* gradient accent strip – only visible when expanded */
   nb-sidebar::before {
     content: '';
     display: block;
@@ -24,6 +24,19 @@
     top: 0;
     z-index: 10;
   }
+
+  /* hide accent + icons-only content when compacted */
+  nb-sidebar.compacted::before { display: none !important; }
+  nb-sidebar.collapsed::before { display: none !important; }
+
+  /* compacted (icon-only) mode: center icons */
+  nb-sidebar.compacted nb-menu .menu-item a {
+    justify-content: center !important;
+    padding: 0.7rem !important;
+    margin: 0.1rem 0.3rem !important;
+  }
+
+  nb-sidebar.compacted nb-menu .menu-item a .menu-title { display: none !important; }
 
   nb-menu .menu-items .menu-item a {
     border-radius: 0.55rem;
@@ -54,7 +67,13 @@
     box-shadow: inset 3px 0 0 $beatflow-primary;
   }
 
-  nb-menu .menu-item nb-icon { display: none !important; }
+  /* show Eva icons properly */
+  nb-menu .menu-item nb-icon {
+    color: inherit !important;
+    font-size: 1.1rem !important;
+    width: 1.2rem !important;
+    flex-shrink: 0;
+  }
 
   /* ── Layout ─────────────────────────────────────────── */
   nb-layout-column {

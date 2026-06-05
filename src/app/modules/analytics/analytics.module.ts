@@ -103,7 +103,7 @@ interface WeekDay {
     }
 
     .page-hero {}
-    .eyebrow { display: block; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: #2dd4bf; margin-bottom: 0.4rem; }
+    .eyebrow { display: block; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: #ff6b1a; margin-bottom: 0.4rem; }
     h1 { margin: 0; font-size: 2.2rem; font-weight: 800; color: #f8fafc; }
     h1 + p { margin: 0.4rem 0 0; color: rgba(148,163,184,.8); font-size: 0.95rem; }
 
@@ -114,8 +114,8 @@ interface WeekDay {
     }
 
     .kpi-card {
-      background: rgba(17,28,54,.8);
-      border: 1px solid rgba(148,163,184,.12);
+      background: rgba(7,8,15,0.7);
+      border: 1px solid rgba(255,255,255,0.08);
       border-radius: 1rem;
       padding: 1.25rem;
       display: grid;
@@ -124,8 +124,8 @@ interface WeekDay {
     }
 
     .kpi-icon { font-size: 1.6rem; }
-    .kpi-value { font-size: 1.5rem; font-weight: 800; color: #f8fafc; }
-    .kpi-label { font-size: 0.78rem; color: rgba(148,163,184,.7); text-transform: uppercase; letter-spacing: 0.05em; }
+    .kpi-value { font-size: 1.5rem; font-weight: 800; color: #f0f4ff; }
+    .kpi-label { font-size: 0.78rem; color: rgba(240,244,255,.6); text-transform: uppercase; letter-spacing: 0.05em; }
 
     .charts-grid {
       display: grid;
@@ -149,7 +149,7 @@ interface WeekDay {
     .bar-track {
       height: 8px;
       border-radius: 99px;
-      background: rgba(148,163,184,.12);
+      background: rgba(255,255,255,0.07);
       overflow: hidden;
     }
 
@@ -188,7 +188,7 @@ interface WeekDay {
     .week-bar {
       width: 60%;
       border-radius: 4px 4px 0 0;
-      background: linear-gradient(180deg, #ff4d6d, #7c3aed);
+      background: linear-gradient(180deg, #ff2d4b, #ff6b1a);
       min-height: 4px;
       transition: height 0.5s cubic-bezier(.4,0,.2,1);
     }
@@ -197,7 +197,7 @@ interface WeekDay {
     .week-min { font-size: 0.68rem; color: rgba(148,163,184,.5); }
 
     .section-head { display: flex; align-items: center; justify-content: space-between; }
-    .badge-live { padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(45,212,191,.12); color: #2dd4bf; font-size: 0.72rem; font-weight: 700; }
+    .badge-live { padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(255,107,26,.12); color: #ff6b1a; font-size: 0.72rem; font-weight: 700; }
 
     .top-list { display: grid; gap: 0.75rem; }
 
@@ -223,8 +223,8 @@ interface WeekDay {
     }
 
     .top-info { min-width: 0; }
-    .top-info strong { display: block; font-size: 0.9rem; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .top-info small { font-size: 0.78rem; color: rgba(148,163,184,.65); }
+    .top-info strong { display: block; font-size: 0.9rem; color: #f0f4ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .top-info small { font-size: 0.78rem; color: rgba(240,244,255,.55); }
 
     .top-bar-mini {
       height: 6px;
@@ -254,11 +254,11 @@ export class AnalyticsPageComponent {
   ];
 
   genreBars: StatBar[] = [
-    { label: 'Reggaeton', value: 34, max: 100, color: '#ff4d6d' },
-    { label: 'Pop', value: 22, max: 100, color: '#7c3aed' },
-    { label: 'Hip-Hop', value: 18, max: 100, color: '#38bdf8' },
-    { label: 'Electronic', value: 14, max: 100, color: '#2dd4bf' },
-    { label: 'R&B', value: 12, max: 100, color: '#f59e0b' },
+    { label: 'Reggaeton', value: 34, max: 100, color: '#ff2d4b' },
+    { label: 'Pop', value: 22, max: 100, color: '#ff6b1a' },
+    { label: 'Hip-Hop', value: 18, max: 100, color: '#00d4ff' },
+    { label: 'Electronic', value: 14, max: 100, color: '#ffab00' },
+    { label: 'R&B', value: 12, max: 100, color: '#ff6b1a' },
   ];
 
   weekActivity: WeekDay[] = [
@@ -276,11 +276,11 @@ export class AnalyticsPageComponent {
   }
 
   topArtists = [
-    { name: 'Bad Bunny', genre: 'Reggaeton', plays: 58, color: '#ff4d6d' },
-    { name: 'The Weeknd', genre: 'R&B / Pop', plays: 47, color: '#7c3aed' },
-    { name: 'Kendrick Lamar', genre: 'Hip-Hop', plays: 39, color: '#38bdf8' },
-    { name: 'Karol G', genre: 'Reggaeton', plays: 33, color: '#2dd4bf' },
-    { name: 'Drake', genre: 'Hip-Hop', plays: 28, color: '#f59e0b' },
+    { name: 'Bad Bunny', genre: 'Reggaeton', plays: 58, color: '#ff2d4b' },
+    { name: 'The Weeknd', genre: 'R&B / Pop', plays: 47, color: '#ff6b1a' },
+    { name: 'Kendrick Lamar', genre: 'Hip-Hop', plays: 39, color: '#00d4ff' },
+    { name: 'Karol G', genre: 'Reggaeton', plays: 33, color: '#ffab00' },
+    { name: 'Drake', genre: 'Hip-Hop', plays: 28, color: '#ff6b1a' },
   ];
 }
 
