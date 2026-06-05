@@ -1,7 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { Component, NgModule } from '@angular/core';
 import { ActivatedRoute, RouterModule, Routes } from '@angular/router';
-import { NbCardModule } from '@nebular/theme';
+import { ReactiveFormsModule } from '@angular/forms';
+import {
+  NbAlertModule,
+  NbButtonModule,
+  NbCardModule,
+  NbFormFieldModule,
+  NbIconModule,
+  NbInputModule,
+  NbToastrModule,
+} from '@nebular/theme';
+
+import { RegisterComponent } from './register/register.component';
 
 @Component({
   selector: 'ngx-bf-auth-page',
@@ -74,11 +85,7 @@ const routes: Routes = [
   },
   {
     path: 'register',
-    component: AuthPageComponent,
-    data: {
-      title: 'Registro de usuario',
-      description: 'Punto de entrada para crear cuentas dentro de la plataforma musical.',
-    },
+    component: RegisterComponent,
   },
   {
     path: 'request-password',
@@ -107,8 +114,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [CommonModule, RouterModule.forChild(routes), NbCardModule],
-  declarations: [AuthPageComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule.forChild(routes),
+    NbCardModule,
+    NbFormFieldModule,
+    NbInputModule,
+    NbIconModule,
+    NbButtonModule,
+    NbAlertModule,
+    NbToastrModule,
+  ],
+  declarations: [AuthPageComponent, RegisterComponent],
 })
-export class AuthModule {
-}
+export class AuthModule {}

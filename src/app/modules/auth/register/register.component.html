@@ -1,0 +1,70 @@
+<div class="register-page">
+  <nb-card class="register-card">
+    <nb-card-header>
+      <div class="brand">
+        <span class="brand-kicker">BeatFlow</span>
+        <h1>Crear cuenta</h1>
+        <p>Accede a tendencias, analítica y descubrimiento musical en una sola plataforma.</p>
+      </div>
+    </nb-card-header>
+
+    <nb-card-body>
+      <form [formGroup]="registerForm" (ngSubmit)="submit()" class="register-form" novalidate>
+        <div class="field-group">
+          <label for="email">Correo electrónico</label>
+          <nb-form-field>
+            <input
+              id="email"
+              nbInput
+              fullWidth
+              formControlName="email"
+              type="email"
+              placeholder="tu@correo.com"
+              status="primary"
+            />
+            <nb-icon nbSuffix icon="email-outline"></nb-icon>
+          </nb-form-field>
+          <p class="field-message" *ngIf="controlHasError('email', 'required')">
+            El correo es obligatorio.
+          </p>
+          <p class="field-message" *ngIf="controlHasError('email', 'email')">
+            Ingresa un correo válido.
+          </p>
+          <p class="field-message" *ngIf="controlHasError('email', 'duplicateEmail')">
+            Este correo ya está registrado.
+          </p>
+        </div>
+
+        <div class="field-group">
+          <label for="password">Contraseña</label>
+          <nb-form-field>
+            <input
+              id="password"
+              nbInput
+              fullWidth
+              formControlName="password"
+              type="password"
+              placeholder="Mínimo 8 caracteres"
+              status="primary"
+            />
+            <nb-icon nbSuffix icon="lock-outline"></nb-icon>
+          </nb-form-field>
+          <p class="field-message" *ngIf="controlHasError('password', 'required')">
+            La contraseña es obligatoria.
+          </p>
+          <p class="field-message" *ngIf="controlHasError('password', 'minlength')">
+            La contraseña debe tener mínimo 8 caracteres.
+          </p>
+        </div>
+
+        <nb-alert status="info" outline>
+          El registro se valida de forma reactiva y los correos duplicados se bloquean antes de continuar.
+        </nb-alert>
+
+        <button nbButton status="primary" size="large" fullWidth type="submit" [disabled]="registerForm.invalid">
+          Crear cuenta
+        </button>
+      </form>
+    </nb-card-body>
+  </nb-card>
+</div>
