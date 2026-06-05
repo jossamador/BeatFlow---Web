@@ -356,7 +356,7 @@ class PopularArtistsService {
                   status="primary"
                   size="small"
                   *ngIf="result.type === 'artist'; else openResultLink"
-                  [routerLink]="['/explore', result.title]"
+                  [routerLink]="['/pages/explore', result.title]"
                 >
                   Ver detalle
                 </a>
@@ -389,7 +389,7 @@ class PopularArtistsService {
             </div>
           </nb-card-body>
           <nb-card-footer>
-            <a nbButton status="primary" [routerLink]="['/explore', artist.name]">
+            <a nbButton status="primary" [routerLink]="['/pages/explore', artist.name]">
               Ver detalle
             </a>
           </nb-card-footer>
@@ -422,7 +422,7 @@ class PopularArtistsService {
     }
 
     .results-list {
-      border: 1px solid rgba(148, 163, 184, 0.2);
+      border: 1px solid rgba(255,255,255,0.07);
       border-radius: 0.7rem;
       overflow: hidden;
     }
@@ -450,12 +450,12 @@ class PopularArtistsService {
     .result-copy p,
     .result-copy small {
       margin: 0;
-      color: var(--text-hint-color, #8f9bb3);
+      color: rgba(240,244,255,.55);
     }
 
     .empty-results {
       margin: 0;
-      color: var(--text-hint-color, #8f9bb3);
+      color: rgba(240,244,255,.55);
     }
 
     .artists-grid {
@@ -481,7 +481,7 @@ class PopularArtistsService {
       font-size: 0.75rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--text-hint-color, #8f9bb3);
+      color: #ff6b1a;
     }
 
     h2 {
@@ -491,7 +491,7 @@ class PopularArtistsService {
 
     .stats p {
       margin: 0.25rem 0;
-      color: var(--text-hint-color, #8f9bb3);
+      color: rgba(240,244,255,.55);
     }
   `],
 })

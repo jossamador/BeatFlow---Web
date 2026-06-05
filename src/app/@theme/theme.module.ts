@@ -1,5 +1,6 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import {
   NbActionsModule,
   NbLayoutModule,
@@ -52,6 +53,7 @@ const NB_MODULES = [
   NbSelectModule,
   NbIconModule,
   NbEvaIconsModule,
+  RouterModule,
 ];
 const COMPONENTS = [
   HeaderComponent,

@@ -4,36 +4,20 @@ import { NgModule } from '@angular/core';
 export const routes: Routes = [
   {
     path: 'auth',
-    loadChildren: () => import('./modules/auth/auth.module')
-      .then(m => m.AuthModule),
+    loadChildren: () => import('./modules/auth/auth.module').then((m) => m.AuthModule),
   },
   {
-    path: 'dashboard',
-    loadChildren: () => import('./modules/dashboard/dashboard.module')
-      .then(m => m.DashboardModule),
+    path: 'pages',
+    loadChildren: () => import('./pages/pages.module').then((m) => m.PagesModule),
   },
-  {
-    path: 'analytics',
-    loadChildren: () => import('./modules/analytics/analytics.module')
-      .then(m => m.AnalyticsModule),
-  },
-  {
-    path: 'explore',
-    loadChildren: () => import('./modules/explore/explore.module')
-      .then(m => m.ExploreModule),
-  },
-  {
-    path: 'playlists',
-    loadChildren: () => import('./modules/playlists/playlists.module')
-      .then(m => m.PlaylistsModule),
-  },
-  {
-    path: 'profile',
-    loadChildren: () => import('./modules/profile/profile.module')
-      .then(m => m.ProfileModule),
-  },
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: '**', redirectTo: 'dashboard' },
+  /* legacy redirects so old links still work */
+  { path: 'dashboard',  redirectTo: 'pages/dashboard',  pathMatch: 'full' },
+  { path: 'explore',    redirectTo: 'pages/explore',    pathMatch: 'full' },
+  { path: 'analytics',  redirectTo: 'pages/analytics',  pathMatch: 'full' },
+  { path: 'playlists',  redirectTo: 'pages/playlists',  pathMatch: 'full' },
+  { path: 'profile',    redirectTo: 'pages/profile',    pathMatch: 'full' },
+  { path: '',           redirectTo: 'pages/dashboard',  pathMatch: 'full' },
+  { path: '**',         redirectTo: 'pages/dashboard' },
 ];
 
 const config: ExtraOptions = {
@@ -44,5 +28,4 @@ const config: ExtraOptions = {
   imports: [RouterModule.forRoot(routes, config)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {
-}
+export class AppRoutingModule {}

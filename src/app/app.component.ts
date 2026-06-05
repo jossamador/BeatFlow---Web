@@ -19,5 +19,16 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.analytics.trackPageViews();
     this.seoService.trackCanonicalChanges();
+    this.hideGlobalSpinner();
+  }
+
+  private hideGlobalSpinner(): void {
+    const spinner = document.getElementById('nb-global-spinner');
+    if (!spinner) {
+      return;
+    }
+
+    spinner.style.display = 'none';
+    spinner.remove();
   }
 }

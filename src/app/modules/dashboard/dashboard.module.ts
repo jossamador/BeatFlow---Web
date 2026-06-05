@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, NgModule, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { NbCardModule, NbIconModule, NbListModule } from '@nebular/theme';
+import { NbCardModule, NbListModule } from '@nebular/theme';
 import { Observable, Subject, of } from 'rxjs';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 
@@ -102,9 +102,28 @@ class TrendingTracksService {
     <section class="feature-page">
       <nb-card class="feature-card hero-card">
         <nb-card-header>
-          <span class="eyebrow">BeatFlow</span>
-          <h1>{{ title }}</h1>
-          <p>{{ description }}</p>
+          <div class="hero-grid">
+            <div>
+              <span class="eyebrow">BeatFlow</span>
+              <h1>{{ title }}</h1>
+              <p>{{ description }}</p>
+            </div>
+
+            <div class="hero-kpis">
+              <div class="kpi-item">
+                <small>Tracks listados</small>
+                <strong>{{ trendingTracks.length }}</strong>
+              </div>
+              <div class="kpi-item">
+                <small>Reproducciones totales</small>
+                <strong>{{ totalPlaycount | number }}</strong>
+              </div>
+              <div class="kpi-item">
+                <small>Top #1</small>
+                <strong>{{ topTrackTitle }}</strong>
+              </div>
+            </div>
+          </div>
         </nb-card-header>
       </nb-card>
 
@@ -129,9 +148,13 @@ class TrendingTracksService {
                 <div class="track-artist">{{ track.artist }}</div>
               </div>
               <div class="track-meta">
-                <nb-icon icon="trending-up-outline"></nb-icon>
+                <span class="trend-icon">↑</span>
                 <span>{{ track.playcount | number }}</span>
               </div>
+
+              <a class="track-link" [href]="track.url" target="_blank" rel="noopener noreferrer">
+                Ver en Last.fm
+              </a>
             </nb-list-item>
           </nb-list>
 
@@ -147,6 +170,8 @@ class TrendingTracksService {
       padding: 1.5rem;
       display: grid;
       gap: 1.25rem;
+      max-width: 1080px;
+      margin: 0 auto;
     }
 
     .feature-card {
@@ -156,8 +181,56 @@ class TrendingTracksService {
 
     .hero-card p {
       margin: 0.5rem 0 0;
-      color: var(--text-hint-color, #8f9bb3);
+      color: rgba(240,244,255,0.72);
       line-height: 1.6;
+    }
+
+    .hero-card {
+      background:
+        radial-gradient(circle at 82% 18%, rgba(0,212,255,.18), transparent 36%),
+        radial-gradient(circle at 20% 90%, rgba(255,45,75,.28), transparent 40%),
+        linear-gradient(135deg, #0d0f1e 0%, #09091a 52%, #04050a 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.15rem;
+      align-items: start;
+    }
+
+    .hero-kpis {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(10rem, 1fr));
+      gap: 0.85rem;
+      width: 100%;
+    }
+
+    .kpi-item {
+      background: rgba(7,8,15,0.6);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 0.75rem;
+      padding: 0.85rem 0.9rem;
+      min-height: 5.2rem;
+      display: grid;
+      align-content: center;
+      gap: 0.25rem;
+    }
+
+    .kpi-item small {
+      color: rgba(240,244,255,0.6);
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .kpi-item strong {
+      color: #f0f4ff;
+      font-size: 1.35rem;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      line-height: 1.15;
     }
 
     .eyebrow {
@@ -166,7 +239,7 @@ class TrendingTracksService {
       font-size: 0.75rem;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--text-hint-color, #8f9bb3);
+      color: #ff6b1a;
     }
 
     h1, h2 {
@@ -176,6 +249,7 @@ class TrendingTracksService {
 
     h1 {
       font-size: 2rem;
+      color: #ffffff;
     }
 
     h2 {
@@ -193,38 +267,49 @@ class TrendingTracksService {
     .live-chip {
       padding: 0.35rem 0.7rem;
       border-radius: 999px;
-      background: rgba(45, 212, 191, 0.12);
-      color: #2dd4bf;
+      background: rgba(255,107,26,0.12);
+      color: #ff6b1a;
       font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 0.04em;
     }
 
+    ::ng-deep nb-list-item {
+      min-height: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+    }
+
     nb-list {
       display: grid;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
 
     .track-item {
       display: grid;
-      grid-template-columns: 3rem 3.5rem 1fr auto;
+      grid-template-columns: 2.2rem 3rem 1fr 6rem 6.5rem;
       align-items: center;
-      gap: 1rem;
-      padding: 0.85rem 0;
+      gap: 0.75rem;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 0.65rem;
+      background: rgba(7,8,15,0.4);
+      min-height: 0;
     }
 
     .rank {
-      font-size: 1.1rem;
+      font-size: 0.9rem;
       font-weight: 800;
       color: #ff4d6d;
+      text-align: center;
     }
 
     .cover {
-      width: 3.5rem;
-      height: 3.5rem;
-      border-radius: 0.75rem;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 0.5rem;
       object-fit: cover;
-      border: 1px solid rgba(148, 163, 184, 0.24);
+      border: 1px solid rgba(148, 163, 184, 0.2);
     }
 
     .track-info {
@@ -234,15 +319,22 @@ class TrendingTracksService {
     }
 
     .track-title {
-      font-size: 1rem;
+      font-size: 0.92rem;
       font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .track-artist {
+      font-size: 0.82rem;
+      color: var(--text-hint-color, #8f9bb3);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .track-artist,
-    .track-meta,
     .empty-state {
       color: var(--text-hint-color, #8f9bb3);
     }
@@ -250,8 +342,30 @@ class TrendingTracksService {
     .track-meta {
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 0.3rem;
       font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text-hint-color, #8f9bb3);
+      white-space: nowrap;
+    }
+
+    .trend-icon {
+      color: #00d4ff;
+      font-weight: 900;
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .track-link {
+      color: #00d4ff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.84rem;
+      white-space: nowrap;
+    }
+
+    .track-link:hover {
+      text-decoration: underline;
     }
 
     .empty-state {
@@ -259,13 +373,18 @@ class TrendingTracksService {
     }
 
     @media (max-width: 640px) {
-      .track-item {
-        grid-template-columns: 3rem 3.5rem 1fr;
+
+      .hero-kpis {
+        grid-template-columns: 1fr;
       }
 
-      .track-meta {
-        grid-column: 3;
-        justify-self: start;
+      .track-item {
+        grid-template-columns: 2rem 2.8rem 1fr;
+      }
+
+      .track-meta,
+      .track-link {
+        display: none;
       }
     }
   `],
@@ -297,6 +416,14 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   trackByRank(_: number, track: TrendingTrack): number {
     return track.rank;
   }
+
+  get totalPlaycount(): number {
+    return this.trendingTracks.reduce((acc, track) => acc + track.playcount, 0);
+  }
+
+  get topTrackTitle(): string {
+    return this.trendingTracks[0]?.title || 'Sin datos';
+  }
 }
 
 const routes: Routes = [
@@ -311,7 +438,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [CommonModule, RouterModule.forChild(routes), NbCardModule, NbListModule, NbIconModule],
+  imports: [CommonModule, RouterModule.forChild(routes), NbCardModule, NbListModule],
   declarations: [DashboardPageComponent],
 })
 export class DashboardModule {

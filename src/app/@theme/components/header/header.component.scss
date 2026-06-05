@@ -6,11 +6,13 @@
 @include nb-install-component() {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
 
   .logo-container {
     display: flex;
     align-items: center;
+    gap: 0.75rem;
     width: calc(#{nb-theme(sidebar-width)} - #{nb-theme(header-padding)});
   }
 
@@ -20,67 +22,97 @@
     align-content: center;
   }
 
-  nb-user {
-    cursor: pointer;
+  nb-user { cursor: pointer; }
+
+  .sidebar-toggle {
+    @include nb-ltr(padding-right, 1rem);
+    @include nb-rtl(padding-left, 1rem);
+    text-decoration: none;
+    color: $beatflow-text-muted;
+    font-size: 1.1rem;
+    transition: color 0.15s;
+
+    &:hover { color: $beatflow-primary; }
   }
 
-  ::ng-deep nb-search button {
-    padding: 0!important;
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+
+    .logo-mark  { color: $beatflow-text; }
+    .logo-accent { color: $beatflow-primary; }
+  }
+
+  /* ── Waveform decoration ── */
+  .wave-bars {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 18px;
+    margin-left: 0.25rem;
+    opacity: 0.7;
+  }
+
+  .wb {
+    display: block;
+    width: 3px;
+    border-radius: 2px;
+    animation: wbPulse 1.4s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+
+  .wb-1 { height: 6px;  background: $beatflow-primary;  animation-delay: 0s; }
+  .wb-2 { height: 14px; background: $beatflow-primary;  animation-delay: 0.1s; }
+  .wb-3 { height: 10px; background: $beatflow-orange;   animation-delay: 0.2s; }
+  .wb-4 { height: 18px; background: $beatflow-orange;   animation-delay: 0.3s; }
+  .wb-5 { height: 12px; background: $beatflow-amber;    animation-delay: 0.2s; }
+  .wb-6 { height: 8px;  background: $beatflow-amber;    animation-delay: 0.1s; }
+  .wb-7 { height: 5px;  background: $beatflow-cyan;     animation-delay: 0s; }
+
+  @keyframes wbPulse {
+    0%, 100% { transform: scaleY(1); opacity: 0.7; }
+    50%       { transform: scaleY(1.5); opacity: 1; }
+  }
+
+  /* ── Header icon buttons ── */
+  .header-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    color: $beatflow-text-muted;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover {
+      background: rgba(255,45,75,0.15);
+      color: $beatflow-primary;
+    }
   }
 
   .header-container {
     display: flex;
     align-items: center;
     width: auto;
-
-    .sidebar-toggle {
-      @include nb-ltr(padding-right, 1.25rem);
-      @include nb-rtl(padding-left, 1.25rem);
-      text-decoration: none;
-      color: nb-theme(text-hint-color);
-      nb-icon {
-        font-size: 1.75rem;
-      }
-    }
-
-    .logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.1rem;
-      padding: 0 1.25rem;
-      font-size: 1.35rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      @include nb-ltr(border-left, 1px solid nb-theme(divider-color));
-      @include nb-rtl(border-right, 1px solid nb-theme(divider-color));
-      white-space: nowrap;
-      text-decoration: none;
-      color: nb-theme(text-basic-color);
-
-      .logo-mark {
-        color: nb-theme(text-basic-color);
-      }
-
-      .logo-accent {
-        color: $beatflow-primary;
-      }
-    }
+    gap: 0.5rem;
   }
 
   @include media-breakpoint-down(sm) {
-    .control-item {
-      display: none;
-    }
-    .user-action {
-      border: none;
-      padding: 0;
-    }
+    .wave-bars { display: none; }
+    .user-action { border: none; padding: 0; }
   }
 
   @include media-breakpoint-down(is) {
-    nb-select {
-      display: none;
-    }
+    .wave-bars { display: none; }
   }
 }

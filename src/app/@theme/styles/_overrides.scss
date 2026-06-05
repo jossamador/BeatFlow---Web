@@ -1,11 +1,191 @@
 @import './themes';
+@import '../../../../styles/variables';
 
 @mixin nb-overrides() {
   nb-select.size-medium button {
     padding: 0.4375rem 2.2rem 0.4375rem 1.125rem !important;
+    nb-icon { right: 0.41rem !important; }
+  }
 
-    nb-icon {
-      right: 0.41rem !important;
-    }
+  /* ── Sidebar ──────────────────────────────────────── */
+  nb-sidebar {
+    background: #040509 !important;
+    border-right: 1px solid rgba(255,255,255,0.07) !important;
+  }
+
+  /* gradient accent strip – only visible when expanded */
+  nb-sidebar::before {
+    content: '';
+    display: block;
+    height: 3px;
+    width: 100%;
+    background: linear-gradient(90deg, $beatflow-primary 0%, $beatflow-orange 55%, $beatflow-amber 100%);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  /* hide accent + icons-only content when compacted */
+  nb-sidebar.compacted::before { display: none !important; }
+  nb-sidebar.collapsed::before { display: none !important; }
+
+  /* compacted (icon-only) mode: center icons */
+  nb-sidebar.compacted nb-menu .menu-item a {
+    justify-content: center !important;
+    padding: 0.7rem !important;
+    margin: 0.1rem 0.3rem !important;
+  }
+
+  nb-sidebar.compacted nb-menu .menu-item a .menu-title { display: none !important; }
+
+  nb-menu .menu-items .menu-item a {
+    border-radius: 0.55rem;
+    margin: 0.1rem 0.65rem;
+    padding: 0.6rem 0.9rem;
+    color: rgba(240,244,255,0.55) !important;
+    font-size: 0.87rem;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.01em;
+    transition: background 0.14s, color 0.14s;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    text-decoration: none;
+  }
+
+  nb-menu .menu-items .menu-item a:hover {
+    background: rgba(255,45,75,0.1) !important;
+    color: rgba(240,244,255,0.9) !important;
+  }
+
+  nb-menu .menu-items .menu-item.active > a,
+  nb-menu .menu-items .menu-item a.active {
+    background: linear-gradient(90deg, rgba(255,45,75,.2), rgba(255,107,26,.12)) !important;
+    color: $beatflow-primary !important;
+    font-weight: 700;
+    box-shadow: inset 3px 0 0 $beatflow-primary;
+  }
+
+  /* show Eva icons properly */
+  nb-menu .menu-item nb-icon {
+    color: inherit !important;
+    font-size: 1.1rem !important;
+    width: 1.2rem !important;
+    flex-shrink: 0;
+  }
+
+  /* ── Layout ─────────────────────────────────────────── */
+  nb-layout-column {
+    padding: 0 !important;
+    background: $beatflow-bg;
+  }
+
+  nb-layout-header nav {
+    background: rgba(4,5,9,0.95) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+    box-shadow: 0 1px 0 rgba(255,45,75,.12) !important;
+  }
+
+  nb-layout-footer {
+    background: #040509 !important;
+    border-top: 1px solid rgba(255,255,255,0.06) !important;
+    padding: 0.65rem 1.5rem !important;
+  }
+
+  /* ── Cards ─────────────────────────────────────────── */
+  nb-card {
+    background: $beatflow-surface !important;
+    border: 1px solid rgba(255,255,255,0.07) !important;
+    border-radius: 0.9rem !important;
+    box-shadow: 0 4px 28px rgba(0,0,0,.5) !important;
+  }
+
+  nb-card-header {
+    border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+    padding: 1.1rem 1.4rem !important;
+    background: transparent !important;
+  }
+
+  nb-card-body  { padding: 1.2rem 1.4rem !important; }
+  nb-card-footer {
+    border-top: 1px solid rgba(255,255,255,0.06) !important;
+    padding: 0.85rem 1.4rem !important;
+  }
+
+  /* ── Inputs ─────────────────────────────────────────── */
+  input[nbinput],
+  .input-full-width input {
+    background: rgba(4,5,9,.8) !important;
+    border-color: rgba(255,255,255,0.12) !important;
+    color: #f0f4ff !important;
+    border-radius: 0.55rem !important;
+    font-family: 'Inter', sans-serif !important;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input[nbinput]:focus,
+  .input-full-width input:focus {
+    border-color: $beatflow-primary !important;
+    box-shadow: 0 0 0 3px rgba(255,45,75,.2) !important;
+  }
+
+  /* ── Buttons ─────────────────────────────────────────── */
+  button[nbbutton].status-primary,
+  a[nbbutton].status-primary {
+    background: $beatflow-primary !important;
+    border-color: $beatflow-primary !important;
+    border-radius: 9999px !important;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif !important;
+    letter-spacing: 0.02em;
+    transition: transform 0.12s, box-shadow 0.15s, background 0.15s;
+  }
+
+  button[nbbutton].status-primary:hover,
+  a[nbbutton].status-primary:hover {
+    background: $beatflow-orange !important;
+    border-color: $beatflow-orange !important;
+    transform: scale(1.03);
+    box-shadow: 0 4px 20px rgba(255,107,26,.45) !important;
+  }
+
+  button[nbbutton].status-info,
+  a[nbbutton].status-info {
+    background: rgba(0,212,255,.12) !important;
+    border-color: $beatflow-cyan !important;
+    color: $beatflow-cyan !important;
+    border-radius: 9999px !important;
+    font-weight: 700;
+  }
+
+  /* ── List items ─────────────────────────────────────── */
+  nb-list-item {
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+  }
+
+  nb-list-item:last-child { border-bottom: none !important; }
+
+  /* ── Radio ──────────────────────────────────────────── */
+  nb-radio .outer-circle { border-color: rgba(255,255,255,.3) !important; }
+
+  /* ── Scrollbar ──────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255,45,75,.3);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,107,26,.5); }
+
+  /* ── Global typography ──────────────────────────────── */
+  body, nb-layout {
+    font-family: 'Inter', 'Open Sans', sans-serif !important;
+    color: #f0f4ff;
+    background: $beatflow-bg;
   }
 }
