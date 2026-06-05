@@ -10,7 +10,6 @@ import {
   NbIconModule,
   NbInputModule,
   NbToastrModule,
-  NbToastrService,
 } from '@nebular/theme';
 import { Subject } from 'rxjs';
 
@@ -74,6 +73,12 @@ import { RegisterComponent } from './register/register.component';
 
             <button nbButton status="primary" fullWidth type="submit" [disabled]="form.invalid || loading">
               {{ loading ? 'Ingresando...' : 'Iniciar sesión' }}
+            </button>
+
+            <div class="divider"><span>o</span></div>
+
+            <button nbButton fullWidth type="button" class="guest-btn" (click)="enterAsGuest()">
+              <i class="fas fa-user-secret"></i> Entrar como invitado
             </button>
 
             <p class="auth-footer-text">
@@ -213,6 +218,38 @@ import { RegisterComponent } from './register/register.component';
 
     .auth-link:hover { text-decoration: underline; }
 
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: rgba(148,163,184,.4);
+      font-size: 0.8rem;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,.08);
+    }
+
+    .guest-btn {
+      background: rgba(255,255,255,.05) !important;
+      border: 1px solid rgba(255,255,255,.12) !important;
+      color: rgba(240,244,255,.65) !important;
+      border-radius: 9999px !important;
+      font-size: 0.88rem;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .guest-btn:hover {
+      background: rgba(255,255,255,.1) !important;
+      color: #f0f4ff !important;
+    }
+
+    .guest-btn i { margin-right: 0.4rem; }
+
     @media (max-width: 768px) {
       .auth-shell { grid-template-columns: 1fr; }
       .auth-brand { display: none; }
@@ -232,7 +269,7 @@ export class LoginPageComponent implements OnDestroy {
   get email(): AbstractControl { return this.form.get('email')!; }
   get password(): AbstractControl { return this.form.get('password')!; }
 
-  constructor(private router: Router, private toastr: NbToastrService) {}
+  constructor(private router: Router) {}
 
   submit(): void {
     if (this.form.invalid) return;
@@ -244,15 +281,20 @@ export class LoginPageComponent implements OnDestroy {
       const match = users.find((u) => u.email === this.email.value && u.password === this.password.value);
       if (match) {
         localStorage.setItem('bf_session', JSON.stringify({ email: match.email, name: match.name || match.email }));
-        this.toastr.success(`¡Bienvenido, ${match.name || match.email}!`, 'Sesión iniciada');
         this.router.navigate(['/dashboard']);
       } else {
-        this.toastr.danger('Correo o contraseña incorrectos.', 'Error de acceso');
+        this.loading = false;
+        alert('Correo o contraseña incorrectos.');
       }
     }, 700);
   }
 
   ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
+
+  enterAsGuest(): void {
+    localStorage.setItem('bf_session', JSON.stringify({ email: 'guest@beatflow.app', name: 'Invitado' }));
+    this.router.navigate(['/dashboard']);
+  }
 }
 
 @Component({
