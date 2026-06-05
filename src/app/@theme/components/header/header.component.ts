@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 
 import { UserData } from '../../../@core/data/users';
 import { LayoutService } from '../../../@core/utils';
-import { BeatflowAuthService } from '../../../@core/services';
+import { BeatflowAuthService, BeatflowSession } from '../../../@core/services';
 import { filter, map, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
@@ -65,11 +65,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     this.authService.session$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((session) => {
+      .subscribe((session: BeatflowSession | null) => {
         if (session) {
           this.user = {
             name: session.name,
-            picture: session.photo || session.user.photo || '',
+            picture: session.photo || session.user?.photo || '',
           };
         }
       });

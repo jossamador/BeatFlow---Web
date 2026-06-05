@@ -1,4 +1,5 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
+import { EnvironmentProviders, Provider } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import {
@@ -79,16 +80,16 @@ const PIPES = [
 })
 export class ThemeModule {
   static forRoot(): ModuleWithProviders<ThemeModule> {
+    const themeRoot = NbThemeModule.forRoot(
+      {
+        name: 'default',
+      },
+      [ DEFAULT_THEME, COSMIC_THEME, CORPORATE_THEME, DARK_THEME ],
+    );
+
     return {
       ngModule: ThemeModule,
-      providers: [
-        ...NbThemeModule.forRoot(
-          {
-            name: 'default',
-          },
-          [ DEFAULT_THEME, COSMIC_THEME, CORPORATE_THEME, DARK_THEME ],
-        ).providers,
-      ],
+      providers: (themeRoot.providers || []) as Array<Provider | EnvironmentProviders>,
     };
   }
 }

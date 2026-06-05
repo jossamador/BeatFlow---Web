@@ -95,6 +95,22 @@
     padding: 0.65rem 1.5rem !important;
   }
 
+  /* Tailwind .fixed collides with Nebular nav.fixed and shrinks header/footer width */
+  nb-layout-header nav.fixed,
+  nb-layout-footer nav.fixed {
+    position: static !important;
+    width: 100% !important;
+    left: auto !important;
+    right: auto !important;
+    margin: 0 !important;
+    max-width: none !important;
+  }
+
+  nb-layout-footer nav {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
   /* ── Cards ─────────────────────────────────────────── */
   nb-card {
     background: $beatflow-surface !important;
