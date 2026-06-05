@@ -1,7 +1,7 @@
 <div class="header-container">
   <div class="logo-container">
     <a (click)="toggleSidebar()" href="#" class="sidebar-toggle" aria-label="Toggle sidebar">
-      <i class="fas fa-bars"></i>
+      <nb-icon icon="menu-2-outline"></nb-icon>
     </a>
     <a class="logo" href="#" (click)="navigateHome()" aria-label="BeatFlow home">
       <span class="logo-mark">Beat</span><span class="logo-accent">Flow</span>
@@ -24,17 +24,17 @@
   <nb-actions size="small">
     <nb-action class="control-item" title="Buscar">
       <a routerLink="/pages/explore" class="header-icon-btn">
-        <i class="fas fa-search"></i>
+        <nb-icon icon="search-outline"></nb-icon>
       </a>
     </nb-action>
     <nb-action class="control-item" title="Mis playlists">
       <a routerLink="/pages/playlists" class="header-icon-btn">
-        <i class="fas fa-list-music"></i>
+        <nb-icon icon="music-outline"></nb-icon>
       </a>
     </nb-action>
     <nb-action class="control-item" title="Analítica">
       <a routerLink="/pages/analytics" class="header-icon-btn">
-        <i class="fas fa-chart-bar"></i>
+        <nb-icon icon="bar-chart-outline"></nb-icon>
       </a>
     </nb-action>
     <nb-action class="user-action" *nbIsGranted="['view', 'user']">

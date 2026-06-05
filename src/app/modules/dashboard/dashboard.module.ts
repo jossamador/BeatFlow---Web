@@ -195,26 +195,27 @@ class TrendingTracksService {
 
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.3fr 1fr;
-      gap: 1rem;
-      align-items: end;
+      grid-template-columns: 1fr;
+      gap: 1.15rem;
+      align-items: start;
     }
 
     .hero-kpis {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.75rem;
+      grid-template-columns: repeat(3, minmax(10rem, 1fr));
+      gap: 0.85rem;
+      width: 100%;
     }
 
     .kpi-item {
       background: rgba(7,8,15,0.6);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 0.75rem;
-      padding: 0.65rem;
-      min-height: 4.7rem;
+      padding: 0.85rem 0.9rem;
+      min-height: 5.2rem;
       display: grid;
       align-content: center;
-      gap: 0.15rem;
+      gap: 0.25rem;
     }
 
     .kpi-item small {
@@ -226,10 +227,10 @@ class TrendingTracksService {
 
     .kpi-item strong {
       color: #f0f4ff;
-      font-size: 1.02rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 1.35rem;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      line-height: 1.15;
     }
 
     .eyebrow {
@@ -372,12 +373,9 @@ class TrendingTracksService {
     }
 
     @media (max-width: 640px) {
-      .hero-grid {
-        grid-template-columns: 1fr;
-      }
 
       .hero-kpis {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
       }
 
       .track-item {
