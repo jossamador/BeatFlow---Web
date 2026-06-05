@@ -6,7 +6,7 @@
 export const environment = {
   production: true,
   lastFm: {
-    baseUrl: 'ws.audioscrobbler.com/2.0/',
+    baseUrl: 'https://ws.audioscrobbler.com/2.0/',
     apiKey: '',
   },
 };
