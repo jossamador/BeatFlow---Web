@@ -74,3 +74,11 @@ export interface BeatflowSearchResponse {
 }
 
 export type BeatflowSearchType = 'track' | 'artist' | 'all';
+
+export interface BeatflowMood {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+  color: string;
+}

@@ -7,6 +7,7 @@ import { environment } from '../../../environments/environment';
 import {
   BeatflowArtist,
   BeatflowArtistDetail,
+  BeatflowMood,
   BeatflowSearchResponse,
   BeatflowSearchType,
   BeatflowTrack,
@@ -33,6 +34,16 @@ export class BeatflowExploreService {
   getArtistDetail(artist: string): Observable<BeatflowArtistDetail> {
     return this.http.get<BeatflowArtistDetail>(`${this.apiUrl}/artists/detail`, {
       params: new HttpParams().set('artist', artist),
+    });
+  }
+
+  getMoods(): Observable<BeatflowMood[]> {
+    return this.http.get<BeatflowMood[]>(`${this.apiUrl}/moods`);
+  }
+
+  getMoodTracks(mood: string, limit: number = 30, page: number = 1): Observable<BeatflowTrack[]> {
+    return this.http.get<BeatflowTrack[]>(`${this.apiUrl}/moods/${encodeURIComponent(mood)}/tracks`, {
+      params: this.paginationParams(limit, page),
     });
   }
 
