@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
 import {
@@ -22,19 +22,39 @@ export class BeatflowExploreService {
   getTrendingTracks(limit: number = 10, page: number = 1): Observable<BeatflowTrack[]> {
     return this.http.get<BeatflowTrack[]>(`${this.apiUrl}/trends`, {
       params: this.paginationParams(limit, page),
-    });
+    }).pipe(
+      tap((tracks) => {
+        console.group('[BeatFlow DEBUG] getTrendingTracks — imageUrl por canción');
+        tracks.forEach((t, i) =>
+          console.log(`  [${i + 1}] "${t.name}" — ${t.artist} → imageUrl: "${t.imageUrl}"`),
+        );
+        console.groupEnd();
+      }),
+    );
   }
 
   getTopArtists(limit: number = 12, page: number = 1): Observable<BeatflowArtist[]> {
     return this.http.get<BeatflowArtist[]>(`${this.apiUrl}/artists/trends`, {
       params: this.paginationParams(limit, page),
-    });
+    }).pipe(
+      tap((artists) => {
+        console.group('[BeatFlow DEBUG] getTopArtists — imageUrl por artista');
+        artists.forEach((a, i) =>
+          console.log(`  [${i + 1}] "${a.name}" → imageUrl: "${a.imageUrl}"`),
+        );
+        console.groupEnd();
+      }),
+    );
   }
 
   getArtistDetail(artist: string): Observable<BeatflowArtistDetail> {
     return this.http.get<BeatflowArtistDetail>(`${this.apiUrl}/artists/detail`, {
       params: new HttpParams().set('artist', artist),
-    });
+    }).pipe(
+      tap((detail) =>
+        console.log(`[BeatFlow DEBUG] getArtistDetail "${detail.name}" → imageUrl: "${detail.imageUrl}"`),
+      ),
+    );
   }
 
   getMoods(): Observable<BeatflowMood[]> {
