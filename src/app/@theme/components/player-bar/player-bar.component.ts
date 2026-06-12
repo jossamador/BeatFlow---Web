@@ -277,6 +277,7 @@ export class PlayerBarComponent implements OnInit, OnDestroy {
     this.ytPlayer = new win['YT']['Player']('bf-yt-player', {
       height: '100%',
       width: '100%',
+      host: 'https://www.youtube-nocookie.com',
       playerVars: {
         listType: 'search',
         list: query,
