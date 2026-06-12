@@ -31,9 +31,9 @@ import { RegisterComponent } from './register/register.component';
             </div>
             <p class="brand-tagline">Tu música. Tus tendencias.</p>
             <div class="brand-features">
-              <div class="feat-item"><span class="feat-icon">🎵</span> Canciones en tendencia</div>
-              <div class="feat-item"><span class="feat-icon">🎤</span> Artistas populares</div>
-              <div class="feat-item"><span class="feat-icon">📊</span> Tu analítica musical</div>
+              <div class="feat-item"><span class="feat-icon"></span> Canciones en tendencia</div>
+              <div class="feat-item"><span class="feat-icon"></span> Artistas populares</div>
+              <div class="feat-item"><span class="feat-icon"></span> Tu analítica musical</div>
             </div>
           </div>
 
@@ -77,7 +77,7 @@ import { RegisterComponent } from './register/register.component';
                   </span>
                 </div>
 
-                <button nbButton status="primary" fullWidth type="submit" [disabled]="form.invalid || loading">
+                <button nbButton status="primary" fullWidth type="submit" class="login-btn" [disabled]="form.invalid || loading">
                   {{ loading ? 'Ingresando...' : 'Iniciar sesión' }}
                 </button>
 
@@ -249,6 +249,26 @@ import { RegisterComponent } from './register/register.component';
       flex: 1;
       height: 1px;
       background: rgba(255,255,255,.08);
+    }
+
+    :host ::ng-deep .login-btn {
+      background: linear-gradient(135deg, #ff4d6d 0%, #e8334a 100%) !important;
+      border-color: transparent !important;
+      color: #ffffff !important;
+      border-radius: 9999px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.04em;
+      transition: opacity 0.15s, transform 0.12s !important;
+    }
+
+    :host ::ng-deep .login-btn:hover:not([disabled]) {
+      opacity: 0.88 !important;
+      transform: translateY(-1px);
+    }
+
+    :host ::ng-deep .login-btn[disabled] {
+      opacity: 0.4 !important;
+      cursor: not-allowed;
     }
 
     .guest-btn {

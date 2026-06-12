@@ -30,6 +30,11 @@
                 "glob": "bootstrap.css.map",
                 "input": "node_modules/bootstrap/dist/css",
                 "output": "/"
+              },
+              {
+                "glob": "_redirects",
+                "input": "src",
+                "output": "/"
               }
             ],
             "styles": [

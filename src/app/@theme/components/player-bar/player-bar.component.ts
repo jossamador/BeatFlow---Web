@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -8,34 +7,32 @@ import { BeatflowPlayerService, PlayerTrack } from '../.././../@core/utils/beatf
 @Component({
   selector: 'ngx-player-bar',
   template: `
-    <div class="player-bar" *ngIf="track" role="region" aria-label="Reproductor de música">
-
+    <div
+      class="player-bar"
+      [class.player-bar--visible]="!!track"
+      role="region"
+      [attr.aria-hidden]="!track"
+      aria-label="Reproductor de música"
+    >
       <div class="player-inner">
 
-        <!-- Iframe YouTube (HU-11.FE.2 + HU-11.FE.3) -->
+        <!-- YouTube IFrame (HU-11.FE.1 + FE.2 + FE.3): el div es el punto de montaje del YT IFrame API -->
         <div class="player-iframe-wrap">
-          <iframe
-            *ngIf="safeUrl"
-            [src]="safeUrl"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-            title="Reproductor YouTube BeatFlow"
-          ></iframe>
+          <div id="bf-yt-player"></div>
         </div>
 
         <!-- Info de la pista -->
         <div class="player-info">
           <div class="player-now">▶ Reproduciendo</div>
-          <div class="player-track" [title]="track.trackName">{{ track.trackName }}</div>
-          <div class="player-artist">{{ track.artistName }}</div>
+          <div class="player-track" [title]="track?.trackName || ''">{{ track?.trackName }}</div>
+          <div class="player-artist">{{ track?.artistName }}</div>
         </div>
 
         <!-- Controles -->
         <div class="player-controls">
           <a
             class="player-yt-link"
-            [href]="ytSearchUrl"
+            [href]="ytSearchUrl || '#'"
             target="_blank"
             rel="noopener noreferrer"
             title="Buscar en YouTube"
@@ -58,11 +55,20 @@ import { BeatflowPlayerService, PlayerTrack } from '../.././../@core/utils/beatf
       left: 0;
       width: 100%;
       z-index: 9999;
-      background:
-        linear-gradient(90deg, rgba(7,13,26,.98) 0%, rgba(11,16,34,.98) 100%);
+      background: linear-gradient(90deg, rgba(7,13,26,.98) 0%, rgba(11,16,34,.98) 100%);
       border-top: 1px solid rgba(255,77,109,.3);
       backdrop-filter: blur(20px);
       box-shadow: 0 -4px 24px rgba(0,0,0,.55);
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(100%);
+      transition: transform 0.25s cubic-bezier(.4,0,.2,1), visibility 0.25s;
+    }
+
+    .player-bar--visible {
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0);
     }
 
     .player-inner {
@@ -77,6 +83,7 @@ import { BeatflowPlayerService, PlayerTrack } from '../.././../@core/utils/beatf
 
     /* ── YouTube iframe (HU-11.FE.1) ── */
     .player-iframe-wrap {
+      position: relative;
       width: 100%;
       aspect-ratio: 16 / 9;
       border-radius: 0.5rem;
@@ -85,9 +92,12 @@ import { BeatflowPlayerService, PlayerTrack } from '../.././../@core/utils/beatf
       flex-shrink: 0;
     }
 
-    .player-iframe-wrap iframe {
-      width: 100%;
-      height: 100%;
+    :host ::ng-deep .player-iframe-wrap iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
       display: block;
     }
 
@@ -194,31 +204,26 @@ import { BeatflowPlayerService, PlayerTrack } from '../.././../@core/utils/beatf
 })
 export class PlayerBarComponent implements OnInit, OnDestroy {
   track: PlayerTrack | null = null;
-  safeUrl: SafeResourceUrl | null = null;
   ytSearchUrl = '';
 
+  private ytPlayer: any = null;
+  private ytApiReady = false;
+  private pendingQuery: string | null = null;
   private readonly destroy$ = new Subject<void>();
 
-  constructor(
-    private readonly playerService: BeatflowPlayerService,
-    private readonly sanitizer: DomSanitizer,
-  ) {}
+  constructor(private readonly playerService: BeatflowPlayerService) {}
 
   ngOnInit(): void {
+    this.initYouTubeAPI();
+
     this.playerService.currentTrack$
       .pipe(takeUntil(this.destroy$))
       .subscribe((track) => {
         this.track = track;
         if (track) {
-          // HU-11.FE.2: construir URL de búsqueda de YouTube
-          const query = encodeURIComponent(`${track.trackName} ${track.artistName}`);
-          const rawUrl = `https://www.youtube.com/embed?listType=search&list=${query}&autoplay=1&rel=0`;
-          // HU-11.FE.3: bypassSecurityTrustResourceUrl para renderizado seguro del iframe
-          this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(rawUrl);
-          this.ytSearchUrl = `https://www.youtube.com/results?search_query=${query}`;
-        } else {
-          this.safeUrl = null;
-          this.ytSearchUrl = '';
+          const query = `${track.trackName} ${track.artistName}`;
+          this.ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+          this.loadYouTubeSearch(query);
         }
       });
   }
@@ -226,9 +231,71 @@ export class PlayerBarComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.destroyPlayer();
   }
 
   close(): void {
     this.playerService.stop();
+  }
+
+  private initYouTubeAPI(): void {
+    const win = window as any;
+    if (win['YT'] && win['YT']['Player']) {
+      this.ytApiReady = true;
+      return;
+    }
+
+    const prevCallback = win['onYouTubeIframeAPIReady'];
+    win['onYouTubeIframeAPIReady'] = () => {
+      if (prevCallback) prevCallback();
+      this.ytApiReady = true;
+      if (this.pendingQuery) {
+        this.loadYouTubeSearch(this.pendingQuery);
+        this.pendingQuery = null;
+      }
+    };
+
+    if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+    }
+  }
+
+  private loadYouTubeSearch(query: string): void {
+    if (!this.ytApiReady) {
+      this.pendingQuery = query;
+      return;
+    }
+
+    this.destroyPlayer();
+
+    const container = document.getElementById('bf-yt-player');
+    if (container) container.innerHTML = '';
+
+    const win = window as any;
+    this.ytPlayer = new win['YT']['Player']('bf-yt-player', {
+      height: '100%',
+      width: '100%',
+      host: 'https://www.youtube-nocookie.com',
+      playerVars: {
+        listType: 'search',
+        list: query,
+        autoplay: 1,
+        rel: 0,
+        modestbranding: 1,
+        iv_load_policy: 3,
+      },
+      events: {
+        onReady: (event: any) => event.target.playVideo(),
+      },
+    });
+  }
+
+  private destroyPlayer(): void {
+    if (this.ytPlayer) {
+      try { this.ytPlayer.destroy(); } catch (_) {}
+      this.ytPlayer = null;
+    }
   }
 }
