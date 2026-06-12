@@ -21,6 +21,9 @@ import { Component } from '@angular/core';
         <ngx-footer></ngx-footer>
       </nb-layout-footer>
     </nb-layout>
+
+    <!-- HU-11: Reproductor fijo inferior (position: fixed, z-index: 9999) -->
+    <ngx-player-bar></ngx-player-bar>
   `,
 })
 export class OneColumnLayoutComponent {}

@@ -21,6 +21,7 @@ import { NbSecurityModule } from '@nebular/security';
 import {
   FooterComponent,
   HeaderComponent,
+  PlayerBarComponent,
   SearchInputComponent,
   TinyMCEComponent,
 } from './components';
@@ -59,6 +60,7 @@ const NB_MODULES = [
 const COMPONENTS = [
   HeaderComponent,
   FooterComponent,
+  PlayerBarComponent,
   SearchInputComponent,
   TinyMCEComponent,
   OneColumnLayoutComponent,
