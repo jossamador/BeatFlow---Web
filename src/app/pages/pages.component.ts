@@ -24,6 +24,11 @@ export class PagesComponent {
       link: '/pages/explore',
     },
     {
+      title: 'Moods',
+      icon: { icon: 'heart-outline', pack: 'eva' },
+      link: '/pages/explore/moods',
+    },
+    {
       title: 'Analítica',
       icon: { icon: 'bar-chart-outline', pack: 'eva' },
       link: '/pages/analytics',
