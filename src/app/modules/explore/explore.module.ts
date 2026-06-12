@@ -31,6 +31,7 @@ import {
   BeatflowSearchType,
   BeatflowTrack,
 } from '../../@core/services';
+import { BeatflowPlayerService } from '../../@core/utils/beatflow-player.service';
 
 interface PopularArtist {
   name: string;
@@ -157,20 +158,29 @@ const FALLBACK_TRACK_RESULTS: SearchResult[] = [
                   <p>{{ result.subtitle }}</p>
                   <small>Oyentes: {{ result.listeners | number }}</small>
                 </div>
-                <a
-                  nbButton
-                  status="primary"
-                  size="small"
-                  *ngIf="result.type === 'artist'; else openResultLink"
-                  [routerLink]="['/pages/explore', result.title]"
-                >
-                  Ver detalle
-                </a>
-                <ng-template #openResultLink>
-                  <a nbButton status="info" size="small" [href]="result.url" target="_blank" rel="noopener noreferrer">
-                    Abrir
+                <div class="result-actions">
+                  <a
+                    nbButton
+                    status="primary"
+                    size="small"
+                    *ngIf="result.type === 'artist'; else openResultLink"
+                    [routerLink]="['/pages/explore', result.title]"
+                  >
+                    Ver detalle
                   </a>
-                </ng-template>
+                  <ng-template #openResultLink>
+                    <a nbButton status="info" size="small" [href]="result.url" target="_blank" rel="noopener noreferrer">
+                      Abrir
+                    </a>
+                  </ng-template>
+                  <!-- HU-11.FE.4: play para canciones en resultados -->
+                  <button
+                    *ngIf="result.type === 'track'"
+                    class="play-btn-sm"
+                    (click)="playResult(result)"
+                    [title]="'Reproducir ' + result.title"
+                  >▶</button>
+                </div>
               </div>
             </nb-list-item>
           </nb-list>
@@ -245,6 +255,33 @@ const FALLBACK_TRACK_RESULTS: SearchResult[] = [
       grid-template-columns: 48px 1fr auto;
       gap: 0.8rem;
       align-items: center;
+    }
+
+    .result-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .play-btn-sm {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      border: 1px solid rgba(255,77,109,.35);
+      background: rgba(255,77,109,.1);
+      color: #ff4d6d;
+      font-size: 0.7rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, transform 0.1s;
+      flex-shrink: 0;
+    }
+
+    .play-btn-sm:hover {
+      background: rgba(255,77,109,.28);
+      transform: scale(1.1);
     }
 
     .result-image {
@@ -333,7 +370,10 @@ export class ExplorePageComponent implements OnInit, OnDestroy {
   isSearching = false;
   private destroy$ = new Subject<void>();
 
-  constructor(private beatflowExploreService: BeatflowExploreService) {}
+  constructor(
+    private beatflowExploreService: BeatflowExploreService,
+    private playerService: BeatflowPlayerService,
+  ) {}
 
   ngOnInit(): void {
     combineLatest([
@@ -374,6 +414,10 @@ export class ExplorePageComponent implements OnInit, OnDestroy {
 
   trackBySearchResult(_: number, result: SearchResult): string {
     return `${result.type}-${result.title}-${result.subtitle}`;
+  }
+
+  playResult(result: SearchResult): void {
+    this.playerService.play(result.title, result.subtitle);
   }
 
   private searchMusic(query: string, filter: BeatflowSearchType): Observable<SearchResult[]> {

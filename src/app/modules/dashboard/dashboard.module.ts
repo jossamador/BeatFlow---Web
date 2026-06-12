@@ -6,6 +6,7 @@ import { Subject, of } from 'rxjs';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 
 import { BeatflowExploreService, BeatflowTrack } from '../../@core/services';
+import { BeatflowPlayerService } from '../../@core/utils/beatflow-player.service';
 
 interface TrendingTrack {
   rank: number;
@@ -106,6 +107,14 @@ const FALLBACK_TRACKS: TrendingTrack[] = [
               <a class="track-link" [href]="track.url" target="_blank" rel="noopener noreferrer">
                 Ver en Last.fm
               </a>
+
+              <!-- HU-11.FE.4: botón play que dispara el reproductor -->
+              <button
+                class="play-btn"
+                (click)="play(track)"
+                [title]="'Reproducir ' + track.title"
+                aria-label="Reproducir en YouTube"
+              >▶</button>
             </nb-list-item>
           </nb-list>
 
@@ -238,7 +247,7 @@ const FALLBACK_TRACKS: TrendingTrack[] = [
 
     .track-item {
       display: grid;
-      grid-template-columns: 2.2rem 3rem 1fr 6rem 6.5rem;
+      grid-template-columns: 2.2rem 3rem 1fr 6rem 6.5rem 2.5rem;
       align-items: center;
       gap: 0.75rem;
       padding: 0.6rem 0.75rem;
@@ -323,6 +332,27 @@ const FALLBACK_TRACKS: TrendingTrack[] = [
       margin: 0;
     }
 
+    .play-btn {
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 50%;
+      border: 1px solid rgba(255,77,109,.35);
+      background: rgba(255,77,109,.1);
+      color: #ff4d6d;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, transform 0.1s;
+      flex-shrink: 0;
+    }
+
+    .play-btn:hover {
+      background: rgba(255,77,109,.28);
+      transform: scale(1.1);
+    }
+
     @media (max-width: 640px) {
 
       .hero-kpis {
@@ -330,7 +360,7 @@ const FALLBACK_TRACKS: TrendingTrack[] = [
       }
 
       .track-item {
-        grid-template-columns: 2rem 2.8rem 1fr;
+        grid-template-columns: 2rem 2.8rem 1fr 2.2rem;
       }
 
       .track-meta,
@@ -347,7 +377,10 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   description = 'Panel principal para tendencias, rankings y métricas visuales de BeatFlow.';
   trendingTracks: TrendingTrack[] = [];
 
-  constructor(private beatflowExploreService: BeatflowExploreService) {}
+  constructor(
+    private beatflowExploreService: BeatflowExploreService,
+    private playerService: BeatflowPlayerService,
+  ) {}
 
   ngOnInit(): void {
     this.beatflowExploreService.getTrendingTracks(10)
@@ -368,6 +401,10 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
 
   trackByRank(_: number, track: TrendingTrack): number {
     return track.rank;
+  }
+
+  play(track: TrendingTrack): void {
+    this.playerService.play(track.title, track.artist);
   }
 
   get totalPlaycount(): number {
